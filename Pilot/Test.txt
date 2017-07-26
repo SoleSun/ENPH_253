@@ -1,0 +1,143 @@
+void testMenu() {
+  LCD.clear(); LCD.home();
+  LCD.print("Entering");
+  LCD.setCursor(0,1); LCD.print("Test Menu");
+  delay(500);
+
+  const int noOfTests = 3;
+  while (true) {
+    /* Show MenuItem value and knob value */
+    int menuIndex = map(knob(6), 0, 1023, 0, noOfTests); /* Menu items plus the Drive option */
+    
+    LCD.clear(); LCD.home();
+    switch (menuIndex){
+      case 0:
+        LCD.print("->Lift Drive");
+        LCD.setCursor(0,1); LCD.print("Encoder");
+        break;
+      case 1:
+        LCD.print("Lift ->Drive");
+        LCD.setCursor(0,1); LCD.print("Encoder");
+        break;
+      case 2:
+        LCD.print("Lift Drive");
+        LCD.setCursor(0,1); LCD.print("->Encoder");
+        break;
+    }
+    
+    if (startbutton()) {
+      delay(100);
+      if (startbutton()) { 
+        switch (menuIndex){
+          case 0:
+            testLiftServos();
+            break;
+          case 1:
+            testMotors();
+            break;
+          case 2:
+            testEncoders();
+            break;
+        }
+      } // if - cross check start button
+    } //if - first check start button
+
+    if (stopbutton())
+    {
+      delay(100);
+      if (stopbutton())
+      { 
+        LCD.clear(); LCD.home();
+        LCD.print("Exiting");
+        LCD.setCursor(0,1); LCD.print("Test Menu");
+        delay(500);
+        return;
+      }
+    }
+  }
+}
+
+void testLiftServos () {
+  while (true){
+    LCD.clear(); LCD.home();
+    // put your main code here, to run repeatedly:
+    int angle = knob(6);
+    int servo0 = map(angle, 0, 1023, 0, 91) ;
+    int servo1 = map(angle, 0, 1023, 180, -1);
+    RCServo0.write(servo0);
+    RCServo1.write(servo1);
+    
+    LCD.setCursor(0, 0); LCD.print(servo0);
+    LCD.setCursor(0, 1); LCD.print(servo1);
+
+    if (stopbutton())
+    {
+      delay(100);
+      if (stopbutton())
+      { 
+        LCD.clear(); LCD.home();
+        LCD.print("Exiting");
+        LCD.setCursor(0,1); LCD.print("Lift Test");
+        delay(500);
+        return;
+      }
+    }
+  }
+}
+
+void testMotors () {
+  while (true){
+    LCD.clear(); LCD.home();
+    int motorSpeed = map(knob(6), 0, 1023, 0, 255);
+    motor.speed(leftMotor, -motorSpeed);
+    motor.speed(rightMotor, motorSpeed);
+
+    if (stopbutton())
+    {
+      delay(100);
+      if (stopbutton())
+      { 
+        LCD.clear(); LCD.home();
+        LCD.print("Exiting");
+        LCD.setCursor(0,1); LCD.print("Motor Test");
+        motor.speed(leftMotor, 0);
+        motor.speed(rightMotor, 0);
+        delay(500);
+        return;
+      }
+    }
+  }
+}
+
+void testEncoders () {
+  start(rightEncoder);
+  start(leftEncoder);
+  
+  while (true){
+    LCD.clear(); LCD.home();
+    int motorSpeed = map(knob(6), 0, 1023, 0, 255);
+    motor.speed(leftMotor, -motorSpeed);
+    motor.speed(rightMotor, motorSpeed);
+
+    LCD.clear(); LCD.home();
+    LCD.print("Right: "); LCD.print(counts[rightEncoder]);
+    LCD.setCursor(0,1);
+    LCD.print("Left: "); LCD.print(counts[leftEncoder]);
+    delay(50);
+  
+    if (stopbutton())
+    {
+      delay(100);
+      if (stopbutton())
+      { 
+        LCD.clear(); LCD.home();
+        LCD.print("Exiting");
+        LCD.setCursor(0,1); LCD.print("Encode Test");
+        motor.speed(leftMotor, 0);
+        motor.speed(rightMotor, 0);
+        delay(500);
+        return;
+      }
+    }
+  }
+}
