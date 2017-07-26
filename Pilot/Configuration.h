@@ -23,3 +23,15 @@
 
 /* Mathematical constants */
 #define pi 3.141592653
+
+
+//Retrival Agent Arm
+#define armPin 9
+#define armUpPosition 150
+#define armDelay 15 
+
+// Retrival Agent Claw
+#define	clawPin 8
+#define clawClosePosition 0
+#define clawOpenPosition 130
+#define clawDelay 10
