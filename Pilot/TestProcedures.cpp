@@ -1,6 +1,7 @@
 #include "TestProcedures.h"
 #include "Configuration.h"
 #include "Encoder.h"
+#include "RetrivalFSM.h"
 #include <phys253.h>
 #include <LiquidCrystal.h>
 
@@ -185,7 +186,7 @@ void TestProcedures::testLift() {
 }
 
 void TestProcedures::testEncoders() {
-  Encoder e = Encoder ();
+  Encoder e;
 
   LCD.clear(); LCD.home();
   LCD.print("Encoder Test");
@@ -229,7 +230,36 @@ void TestProcedures::testEncoders() {
   }
 }
 
-void TestProcedures::testMinMotor(){
-  LCD.clear(); LCD.home();
+void TestProcedures::testMinMotor() {
+    
+    LCD.clear(); LCD.home();
+    LCD.print("Testing Min Speed");
+    delay(500);
+    
+    while(true){
+        
+        int motorSpeed = map (knob(6), 0, 1023, 0, 255);
+        motor.speed(leftMotor, -motorSpeed);
+        motor.speed(rightMotor, motorSpeed);
+        LCD.clear(); LCD.print(motorSpeed);
+        delay(100);
+        if(stopbutton()){
+            return;
+        }
+    }
+}
+void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDistanceVal,int maneuverLeftConstantVal,int maneuverRightConstantVal,int minMotorSpeedVal){
+  while(true){
+    maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,minMotorSpeedVal, false);
   }
+  if (stopbutton()){
+  delay(100);
+    if(stopbutton()){
+      LCD.clear(); LCD.home();
+      LCD.print("Exiting Maneuver Test");
+      delay(500);
+      return;
+    }
+  }
+}
 
