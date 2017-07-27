@@ -35,7 +35,7 @@ enum States{S_TapeFollow, S_Forward, S_Retrieve, S_Reverse, S_Exit};
 extern States g_CurrentState;
 
  
-void executeRetrivalFSM(int armDownPositions [6], int p, int d, int threshold, int motorSpeed);
+void executeRetrivalFSM( int p, int d, int threshold, int motorSpeed);
 
 
 //State 0: Right turn

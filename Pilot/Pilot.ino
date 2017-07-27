@@ -58,19 +58,13 @@ void testMenu() {
   LCD.setCursor(0,1); LCD.print("Test Menu");
   delay(500);
 
-<<<<<<< HEAD
-  TestProcedures t = TestProcedures (); 
-  
-  while (true) {
-    int menuIndex = map(knob(6), 0, 1023, 0, 6);
-=======
+
   const int noOfTestOptions = 7; 
   
   TestProcedures t = TestProcedures (); 
   
   while (true) {
     int menuIndex = map(knob(6), 0, 1023, 0, noOfTestOptions);
->>>>>>> aee1ec09fe272ea3f968dde27ee08699a73e128a
 
     LCD.clear(); LCD.home();
     switch (menuIndex){
@@ -91,15 +85,6 @@ void testMenu() {
         LCD.setCursor(0,1); LCD.print("Motor >Lift");
         break;
       case 4:
-<<<<<<< HEAD
-        LCD.print("Motor Lift");
-        LCD.setCursor(0,1); LCD.print(">MinMotor Maneuver");
-        break;
-     case 5: 
-      LCD.print("Motor Lift");
-      LCD.setCursor(0,1); LCD.print("MinMotor >Maneuver");
-      break;
-=======
         LCD.print(">Encoder");
         break;
       case 5:
@@ -108,7 +93,6 @@ void testMenu() {
       case 6: 
         LCD.print("MinMotor >Maneuver");
         break;
->>>>>>> aee1ec09fe272ea3f968dde27ee08699a73e128a
     }
     delay(100);
 
@@ -126,16 +110,8 @@ void testMenu() {
             t.testMotors();
             break;
           case 3:
-<<<<<<< HEAD
+
 //            t.testLifts();
-            break;
-          case 4:
-            t.testMinMotor();
-            break;
-          case 5:
-            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManueverLeftConstant->Value, ManueverRightConstant->Value, MinMotorSpeed->Value);
-=======
-            t.testLift();
             break;
           case 4:
             t.testEncoders();
@@ -146,7 +122,6 @@ void testMenu() {
            break;
           case 6:
             t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,MinMotorSpeed->Value);
->>>>>>> aee1ec09fe272ea3f968dde27ee08699a73e128a
             break;
         }
       } // if - cross check start button
@@ -264,33 +239,6 @@ void setup()
   delay(1000);
   Serial.begin(9600);
 
-<<<<<<< HEAD
-  Speed                    = new MenuItem("Speed");
-  ProportionalGain         = new MenuItem("P-gain");
-  DerivativeGain           = new MenuItem("D-gain");
-  Threshold                = new MenuItem("Threshold");
-  Error                    = new MenuItem("Error");
-  DistanceToGate           = new MenuItem("GateDist");
-  ThresholdGate            = new MenuItem("ThreshGate");
-  LeftTargetDistanceValue  = new MenuItems("LeftTargetDistance");
-  RightTargetDistanceValue = new MenuItems("RightTargetDistance");
-  ManeuverLeftConstant     = new MenuItems("LeftManeuverP");
-  ManeuverRightConstant    = new MenuItems("RightManeuverP");
-  MinMotorSpeed            = new MenuItems("MinMotorSpeed");
- 
-  menuItems[0]             = Speed; 
-  menuItems[1]             = ProportionalGain; 
-  menuItems[2]             = DerivativeGain; 
-  menuItems[3]             = Error;
-  menuItems[4]             = Threshold;
-  menuItems[5]             = DistanceToGate;
-  menuItems[6]             = ThresholdGate;
-  menuItems[7]             = LeftTargetDistanceValue;
-  menuItems[8]             = RightTargetDistanceValue;
-  menuItems[9]             = ManeuverLeftConstant;
-  menuItems[10]            = ManeuverRightConstant;
-  menuItems[11]            = MinMotorSpeed;
-=======
   Speed             = new MenuItem("Speed");
   ProportionalGain  = new MenuItem("P-gain");
   DerivativeGain    = new MenuItem("D-gain");
@@ -321,8 +269,7 @@ void setup()
   menuItems[10]     = ManeuverLeftConstant;
   menuItems[11]     = ManeuverRightConstant;
   menuItems[12]     = MinMotorSpeed;
-  
->>>>>>> aee1ec09fe272ea3f968dde27ee08699a73e128a
+
 }
  
 void loop()
