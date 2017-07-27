@@ -11,5 +11,5 @@ class TestProcedures {
     void testMotors ();
     void testLifts ();
     void testMinMotor ();
-	void testManeuver ();
+    void testManeuver (int leftTargetDistance, int rightTargetDistance, int maneuverLeftConstant, int maneuverRightConstant, int minMotorSpeed);
 };
