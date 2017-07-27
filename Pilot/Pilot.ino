@@ -11,6 +11,7 @@
 #include "MenuItem.h"
 #include "Encoder.h"
 #include "Gate_Navigator.h"
+#include "TestProcedures.h"
 
 /*
  * A cross is black tape that crosses the path, indicating either the entrance
@@ -39,28 +40,40 @@ Gate_Navigator * gateSequence;
  *  switching between the different states
  */
 void Pilot() {
-  gateSequence = new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value);
+  gateSequence = 
+  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value);
   gateSequence->Drive();
+  
 }
 
 void testMenu() {
   LCD.clear(); LCD.home();
   LCD.print("Entering");
-  LCD.setCursor(0,1); LCD.print("PID Menu");
+  LCD.setCursor(0,1); LCD.print("Test Menu");
   delay(500);
 
+  TestProcedures t = TestProcedures (); 
+  
   while (true) {
-    int menuIndex = map(knob(6), 0, 1023, 0, 1);
+    int menuIndex = map(knob(6), 0, 1023, 0, 4);
 
     LCD.clear(); LCD.home();
     switch (menuIndex){
       case 0:
-        LCD.print("->Gate Encoder");
-        LCD.setCursor(0,1); LCD.print("Other");
+        LCD.print(">Gate PID");
+        LCD.setCursor(0,1); LCD.print("Motor Lift");
         break;
       case 1:
-        LCD.print("Gate ->Encoder");
-        LCD.setCursor(0,1); LCD.print("Other");
+        LCD.print("Gate >PID");
+        LCD.setCursor(0,1); LCD.print("Motor Lift");
+        break;
+      case 2:
+        LCD.print("Gate PID");
+        LCD.setCursor(0,1); LCD.print(">Motor Lift");
+        break;
+      case 3:
+        LCD.print("Gate PID");
+        LCD.setCursor(0,1); LCD.print("Motor >Lift");
         break;
     }
     delay(100);
@@ -70,9 +83,16 @@ void testMenu() {
       if (startbutton()) { 
         switch (menuIndex){
           case 0:
-            testGateSensors();
+            t.testGateSensors();
             break;
           case 1:
+            t.testPID(Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value);
+            break;
+          case 2:
+            t.testMotors();
+            break;
+          case 3:
+            t.testLifts();
             break;
         }
       } // if - cross check start button
@@ -86,30 +106,6 @@ void testMenu() {
         LCD.clear(); LCD.home();
         LCD.print("Exiting");
         LCD.setCursor(0,1); LCD.print("Test Menu");
-        delay(500);
-        return;
-      }
-    }
-  }
-}
-
-void testGateSensors() {
-  while(true) {
-    int gateActive = analogRead (OneKHzSensorPin),
-         ziplineNear = analogRead (TenKHzSensorPin);
-
-    LCD.clear(); LCD.home();
-    LCD.print(gateActive); LCD.print(" "); LCD.print(ziplineNear);
-    delay(500);
-
-    if (stopbutton())
-    {
-      delay(100);
-      if (stopbutton())
-      { 
-        LCD.clear(); LCD.home();
-        LCD.print("Exiting");
-        LCD.setCursor(0,1); LCD.print("Gate Test");
         delay(500);
         return;
       }
@@ -173,15 +169,15 @@ void mainMenu()
     switch (menuIndex){
       case 0:
         LCD.print("->PID Drive");
-        LCD.setCursor(0,1); LCD.print("Other");
+        LCD.setCursor(0,1); LCD.print("Test");
         break;
       case 1:
         LCD.print("PID ->Drive");
-        LCD.setCursor(0,1); LCD.print("Other");
+        LCD.setCursor(0,1); LCD.print("Test");
         break;
       case 2:
         LCD.print("PID Drive");
-        LCD.setCursor(0,1); LCD.print("->Other");
+        LCD.setCursor(0,1); LCD.print("->Test");
         break;
     }
     delay(100);
@@ -211,7 +207,7 @@ void setup()
   LCD.home();
   #include <phys253setup.txt>
   LCD.print("Welcome!");
-  delay(2000);
+  delay(1000);
   Serial.begin(9600);
 
   Speed            = new MenuItem("Speed");
