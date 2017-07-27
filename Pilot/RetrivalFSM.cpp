@@ -6,6 +6,7 @@
 #define ALIGN_DIST 17.4
 #define LEFT_CONST 2
 #define RIGHT_CONST 5
+#define DEBUG 
 
 
 //PID parameters:
@@ -26,16 +27,20 @@ void executeRetrivalFSM(int armDownPositions [6], int p, int d, int QRDthreshold
 	
 	// PID: 
 	
-   int proportional = p;
-    int derivative = d;
-    int threshold = threshold;
-    int motorSpeed = motorSpeed; 
+    proportional = p;
+    derivative = d;
+    threshold = threshold;
+    motorSpeed = motorSpeed; 
     
 	
 	while(!fsmDone){
 		switch(g_CurrentState){ 
 			case S_TapeFollow:
 				tapeFollow();
+               
+               lastError = 0;
+               recentError = 0;
+               
 				if(detectCross()) {
 					g_CurrentState = S_Forward; 
 					
@@ -45,14 +50,17 @@ void executeRetrivalFSM(int armDownPositions [6], int p, int d, int QRDthreshold
 			
 			case S_Forward:
 				forward();
-					g_CurrentState = S_Retrieve;
+				g_CurrentState = S_Retrieve;
 				break;
 					
 			
 			case S_Retrieve:
-				newClaw.retrieve(armDownPositions [counter]);
-				counter++;
-				if(counter ==6){
+                if (counter >= 0 && counter <6){
+                    newClaw.retrieve(armDownPositions [counter]);
+                    counter++; 
+                } 
+				
+				if(counter >=6){
 					g_CurrentState = S_Exit; 
 				}else{
 					g_CurrentState = S_Reverse; 
@@ -61,9 +69,7 @@ void executeRetrivalFSM(int armDownPositions [6], int p, int d, int QRDthreshold
 			
 			
 			case S_Reverse:
-				if(!backOnTape)
 					reverse();
-				else
 					g_CurrentState = S_TapeFollow;
 				break;
 				
@@ -99,12 +105,10 @@ const bool detectCross(){
 
 // back to tape
 const bool backOnTape(){
-	
+	//require testing**********************************************
 	bool 
-	 L = analogRead(leftQRDSensor) > threshold,
         CL = analogRead(centreLeftQRDSensor) > threshold,
-        CR = analogRead(centreRightQRDSensor) > threshold,
-        R = analogRead(rightQRDSensor) > threshold; 
+        CR = analogRead(centreRightQRDSensor) > threshold;
         
 
 	if( CL|| CR)
@@ -184,16 +188,22 @@ void maneuver(double leftTargetDistance, double rightTargetDistance,double leftC
 		if( reverse){
 			leftSpeed = (minimumMotorSpeed + leftDifference * leftConstant);
 			rightSpeed = - minimumMotorSpeed + rightDifference * rightConstant; 
+            
+            if (backOnTape(){
+                return; 
+            }
 		}else{
 		 leftSpeed = -(minimumMotorSpeed + leftDifference * leftConstant);
 		 rightSpeed = minimumMotorSpeed + rightDifference * rightConstant;
 		}
-		
+
+        #ifdef DEBUG
 		LCD.home();
 		LCD.print("leftMotor:"), LCD.print(" "), LCD.print(encoders.getDistanceLeftWheel());
 		LCD.setCursor(0,1);
         LCD.print("rightMotor:"), LCD.print(" "), LCD.print(encoders.getDistanceRightWheel());
        LCD.clear();
+       #endif
 
         motor.speed(leftMotor, leftSpeed);
         motor.speed(rightMotor, rightSpeed);
