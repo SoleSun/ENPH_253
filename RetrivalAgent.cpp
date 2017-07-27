@@ -83,8 +83,8 @@ void RetrivalAgent:: maneuver(int leftTargetDistance, int rightTargetDistance,in
         leftDifference = leftTargetDistance- encoders.getDistanceLeftWheel();
         rightDifference = rightTargetDistance - encoders.getDistanceRightWheel();
 
-        int leftSpeed = -(minimumMotorSpeed + leftDifference * leftConstant);
-        int rightSpeed = minimumMotorSpeed + rightDifference * rightConstant; 
+        double leftSpeed = -(minimumMotorSpeed + leftDifference * leftConstant);
+        double rightSpeed = minimumMotorSpeed + rightDifference * rightConstant; 
 
         motor.speed(leftMotor, leftSpeed);
         motor.speed(rightMotor, rightSpeed);
@@ -105,7 +105,7 @@ bool RetrivalAgent:: detectCross(){
 
 
 // tape Follow:
-void RetrivalAgent:: tapeFollow(){
+void tapeFollow(){
     // boolean values for PID tuning
     bool 
           L = analogRead(leftQRDSensor) > threshold,

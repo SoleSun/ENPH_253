@@ -53,6 +53,11 @@ void Claw::clawSetUp(){
     
 }
 
+void Claw:: clawGateConfiguration(){
+     p_claw->write(p_clawClosePosition);
+    p_arm->write(p_armDownPosition+20);
+}
+
 
 void Claw::clawOpen() {
     //opening the claw
