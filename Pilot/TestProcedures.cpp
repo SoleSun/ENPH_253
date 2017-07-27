@@ -1,4 +1,5 @@
 #include "TestProcedures.h"
+#include "RetrivalFSM.h"
 #include "Configuration.h"
 #include <phys253.h>
 #include <LiquidCrystal.h>
@@ -134,6 +135,7 @@ void TestProcedures::testMotors () {
   }
 }
 
+
 void TestProcedures::testLifts() {
   int flag = 0;
   while (true){
@@ -182,9 +184,23 @@ void TestProcedures::testMinMotor() {
         motor.speed(rightMotor, motorSpeed);
         LCD.clear(); LCD.print(motorSpeed);
         delay(100);
-        
         if(stopbutton()){
             return;
         }
     }
+}
+void TestProcedures::testManeuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverRightConstantVal,maneuverLeftConstantVal,minMotorSpeedVal){
+  RetrivalFSM r = new RetrivalFSM();
+	while(true){
+		r.maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,minMotorSpeedVal, false);
+	}
+	if (stopbotton()){
+	delay(100);
+		if(stopbotton()){
+			LCD.clear(); LCD.home();
+			LCD.print("Exiting Maneuver Test");
+			delay(500);
+			return;
+		}
+	}
 }
