@@ -61,7 +61,9 @@ void executeRetrivalFSM(int armDownPositions [6], int p, int d, int QRDthreshold
 			
 			
 			case S_Reverse:
-				reverse();
+				if(!backOnTape)
+					reverse();
+				else
 					g_CurrentState = S_TapeFollow;
 				break;
 				
@@ -77,6 +79,40 @@ void executeRetrivalFSM(int armDownPositions [6], int p, int d, int QRDthreshold
 	
  }
  
+
+// check cross 
+
+const bool detectCross(){
+	bool 
+	 L = analogRead(leftQRDSensor) > threshold,
+        CL = analogRead(centreLeftQRDSensor) > threshold,
+        CR = analogRead(centreRightQRDSensor) > threshold,
+        R = analogRead(rightQRDSensor) > threshold; 
+      
+      if((L||R)&&(CL&&CR)){
+		return true;
+      }else{
+		return false; 
+      }
+	
+}
+
+// back to tape
+const bool backOnTape(){
+	
+	bool 
+	 L = analogRead(leftQRDSensor) > threshold,
+        CL = analogRead(centreLeftQRDSensor) > threshold,
+        CR = analogRead(centreRightQRDSensor) > threshold,
+        R = analogRead(rightQRDSensor) > threshold; 
+        
+
+	if( CL|| CR)
+		return true;
+	else 
+		return false; 
+	
+}
 
 
 //tape following
@@ -146,14 +182,20 @@ void maneuver(double leftTargetDistance, double rightTargetDistance,double leftC
         double leftSpeed; 
         double rightSpeed; 
 		if( reverse){
-			 leftSpeed = (minimumMotorSpeed + leftDifference * leftConstant);
-			 rightSpeed = - minimumMotorSpeed + rightDifference * rightConstant; 
+			leftSpeed = (minimumMotorSpeed + leftDifference * leftConstant);
+			rightSpeed = - minimumMotorSpeed + rightDifference * rightConstant; 
 		}else{
-		
-			 leftSpeed = -(minimumMotorSpeed + leftDifference * leftConstant);
-			 rightSpeed = minimumMotorSpeed + rightDifference * rightConstant;
+		 leftSpeed = -(minimumMotorSpeed + leftDifference * leftConstant);
+		 rightSpeed = minimumMotorSpeed + rightDifference * rightConstant;
 		}
-         motor.speed(leftMotor, leftSpeed);
+		
+		LCD.home();
+		LCD.print("leftMotor:"), LCD.print(" "), LCD.print(encoders.getDistanceLeftWheel());
+		LCD.setCursor(0,1);
+        LCD.print("rightMotor:"), LCD.print(" "), LCD.print(encoders.getDistanceRightWheel());
+       LCD.clear();
+
+        motor.speed(leftMotor, leftSpeed);
         motor.speed(rightMotor, rightSpeed);
     }
 }

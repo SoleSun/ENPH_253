@@ -52,6 +52,7 @@ void retrieveAgent();
 
 //Steate 4: 
 void reverse();
+const bool backOnTape();
 
 //State 5:
 void exit();

@@ -92,7 +92,7 @@ void testMenu() {
             t.testMotors();
             break;
           case 3:
-            t.testLifts();
+//            t.testLifts();
             break;
         }
       } // if - cross check start button

@@ -8,5 +8,5 @@ class TestProcedures {
 		void testGateSensors();
 		void testPID (int thresholdVal, int proportionalVal, int derivativeVal, int speedVal);
     void testMotors ();
-    void testLift ();
+    void testLifts ();
 };
