@@ -77,12 +77,8 @@ void testMenu() {
         break;
       case 4:
         LCD.print("Motor Lift");
-        LCD.setCursor(0,1); LCD.print(">MinMotor Maneuver");
+        LCD.setCursor(0,1); LCD.print(">Retrieval");
         break;
-      case 5:
-       LCD.print("Motor Lift");
-       LCD.setCursor(0,1); LCD.print("MinMotor >Maneuver")
-       
     }
     delay(100);
 
@@ -102,10 +98,10 @@ void testMenu() {
           case 3:
 //            t.testLifts();
             break;
-          case 4:
+          case 4;
             t.testMinMotor();
-          case 5:
-            t.testMmaneuver();
+          case 5;
+            t.testManeuver();
         }
       } // if - cross check start button
     }
