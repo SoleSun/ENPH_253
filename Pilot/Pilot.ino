@@ -29,6 +29,11 @@ MenuItem * Threshold; /* Thershold for detecting black line */
 MenuItem * Error;
 MenuItem * DistanceToGate; 
 MenuItem * ThresholdGate;
+MenuItem * LeftTargetDistanceValue;
+MenuItem * RightTargetDistanceValue;
+MenuItem * ManeuverLeftConstant;
+MenuItem * ManeuverRightConstant;
+MenuItem * MinMotorSpeed;
 MenuItem * menuItems[numberOfPIDMenuOptions];
 Gate_Navigator * gateSequence;
 
@@ -77,8 +82,12 @@ void testMenu() {
         break;
       case 4:
         LCD.print("Motor Lift");
-        LCD.setCursor(0,1); LCD.print(">Retrieval");
+        LCD.setCursor(0,1); LCD.print(">MinMotor Maneuver");
         break;
+     case 5: 
+      LCD.print("Motor Lift");
+      LCD.setCursor(0,1); LCD.print("MinMotor >Maneuver");
+      break;
     }
     delay(100);
 
@@ -100,8 +109,10 @@ void testMenu() {
             break;
           case 4;
             t.testMinMotor();
+            break;
           case 5;
-            t.testManeuver();
+            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManueverLeftConstant->Value, ManueverRightConstant->Value, MinMotorSpeed->Value);
+            break;
         }
       } // if - cross check start button
     }
@@ -218,20 +229,31 @@ void setup()
   delay(1000);
   Serial.begin(9600);
 
-  Speed            = new MenuItem("Speed");
-  ProportionalGain = new MenuItem("P-gain");
-  DerivativeGain   = new MenuItem("D-gain");
-  Threshold        = new MenuItem("Threshold");
-  Error            = new MenuItem("Error");
-  DistanceToGate   = new MenuItem("GateDist");
-  ThresholdGate    = new MenuItem("ThreshGate");
-  menuItems[0]     = Speed; 
-  menuItems[1]     = ProportionalGain; 
-  menuItems[2]     = DerivativeGain; 
-  menuItems[3]     = Error;
-  menuItems[4]     = Threshold;
-  menuItems[5]     = DistanceToGate;
-  menuItems[6]     = ThresholdGate;
+  Speed                    = new MenuItem("Speed");
+  ProportionalGain         = new MenuItem("P-gain");
+  DerivativeGain           = new MenuItem("D-gain");
+  Threshold                = new MenuItem("Threshold");
+  Error                    = new MenuItem("Error");
+  DistanceToGate           = new MenuItem("GateDist");
+  ThresholdGate            = new MenuItem("ThreshGate");
+  LeftTargetDistanceValue  = new MenuItems("LeftTargetDistance");
+  RightTargetDistanceValue = new MenuItems("RightTargetDistance");
+  ManeuverLeftConstant     = new MenuItems("LeftManeuverP");
+  ManeuverRightConstant    = new MenuItems("RightManeuverP");
+  MinMotorSpeed            = new MenuItems("MinMotorSpeed");
+ 
+  menuItems[0]             = Speed; 
+  menuItems[1]             = ProportionalGain; 
+  menuItems[2]             = DerivativeGain; 
+  menuItems[3]             = Error;
+  menuItems[4]             = Threshold;
+  menuItems[5]             = DistanceToGate;
+  menuItems[6]             = ThresholdGate;
+  menuItems[7]             = LeftTargetDistanceValue;
+  menuItems[8]             = RightTargetDistanceValue;
+  menuItems[9]             = ManeuverLeftConstant;
+  menuItems[10]            = ManeuverRightConstant;
+  menuItems[11]            = MinMotorSpeed;
 }
  
 void loop()
