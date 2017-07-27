@@ -107,10 +107,10 @@ void testMenu() {
           case 3:
 //            t.testLifts();
             break;
-          case 4;
+          case 4:
             t.testMinMotor();
             break;
-          case 5;
+          case 5:
             t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManueverLeftConstant->Value, ManueverRightConstant->Value, MinMotorSpeed->Value);
             break;
         }

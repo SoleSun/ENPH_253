@@ -32,7 +32,7 @@
 */
 
 enum States{S_TapeFollow, S_Forward, S_Retrieve, S_Reverse, S_Exit};
-States g_CurrentState;
+extern States g_CurrentState;
 
  
 void executeRetrivalFSM(int armDownPositions [6], int p, int d, int threshold, int motorSpeed);
@@ -58,4 +58,4 @@ const bool backOnTape();
 void exit();
 
  void tapeFollow();
-void maneuver(double leftTargetDistance, double rightTargetDistance,double leftConstant, double rightConstant, double minimumMotorSpeed, bool reverse);
+void maneuver(int leftTargetDistance, int rightTargetDistance, int  leftConstant, int rightConstant, int minimumMotorSpeed, bool reverse);

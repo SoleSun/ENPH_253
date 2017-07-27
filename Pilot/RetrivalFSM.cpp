@@ -20,6 +20,7 @@ int motorSpeed;
 // agents servoPositions:
 int armDownPositions[6] = {144, 140,146,144,140,146};
 
+States g_CurrentState = S_TapeFollow; 
 
 void executeRetrivalFSM(int armDownPositions [6], int p, int d, int QRDthreshold, int MotorSpeed){
  
@@ -41,6 +42,7 @@ void executeRetrivalFSM(int armDownPositions [6], int p, int d, int QRDthreshold
 			case S_TapeFollow:
 				tapeFollow();
                
+               //reseting error values. 
                lastError = 0;
                recentError = 0;
                
@@ -193,18 +195,18 @@ void  tapeFollow(){
  
  // maneuvering the robot. 
  
-void maneuver(double leftTargetDistance, double rightTargetDistance,double leftConstant, double rightConstant, double minimumMotorSpeed, bool reverse){
+void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, int rightConstant, int minimumMotorSpeed, bool reverse){
 
-    double leftDifference = leftTargetDistance;
-    double rightDifference = rightTargetDistance; 
+    int leftDifference = leftTargetDistance;
+    int rightDifference = rightTargetDistance; 
     Encoder encoders;
     
     while(leftDifference > 0 || rightDifference >0){
         leftDifference = leftTargetDistance- encoders.getDistanceLeftWheel();
         rightDifference = rightTargetDistance - encoders.getDistanceRightWheel();
 
-        double leftSpeed; 
-        double rightSpeed; 
+        int leftSpeed; 
+        int rightSpeed; 
 		if( reverse){
 			leftSpeed = (minimumMotorSpeed + leftDifference * leftConstant);
 			rightSpeed = - minimumMotorSpeed + rightDifference * rightConstant; 
