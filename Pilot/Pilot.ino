@@ -55,7 +55,7 @@ void testMenu() {
   TestProcedures t = TestProcedures (); 
   
   while (true) {
-    int menuIndex = map(knob(6), 0, 1023, 0, 5);
+    int menuIndex = map(knob(6), 0, 1023, 0, 6);
 
     LCD.clear(); LCD.home();
     switch (menuIndex){
@@ -77,8 +77,12 @@ void testMenu() {
         break;
       case 4:
         LCD.print("Motor Lift");
-        LCD.setCursor(0,1); LCD.print(">Retrieval");
+        LCD.setCursor(0,1); LCD.print(">MinMotor Maneuver");
         break;
+      case 5:
+       LCD.print("Motor Lift");
+       LCD.setCursor(0,1); LCD.print("MinMotor >Maneuver")
+       
     }
     delay(100);
 
@@ -98,8 +102,10 @@ void testMenu() {
           case 3:
 //            t.testLifts();
             break;
-          case 4;
-            t.testRetrieval();
+          case 4:
+            t.testMinMotor();
+          case 5:
+            t.testMmaneuver();
         }
       } // if - cross check start button
     }
