@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 
 class TestProcedures {
@@ -9,4 +10,5 @@ class TestProcedures {
 		void testPID (int thresholdVal, int proportionalVal, int derivativeVal, int speedVal);
     void testMotors ();
     void testLifts ();
+    void testRetrieval ();
 };
