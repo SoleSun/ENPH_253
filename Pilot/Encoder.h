@@ -18,4 +18,6 @@ class Encoder {
 		int getDistanceLeftWheel();
 		int getTicks (unsigned int INTX);
 
+    int convertDistToTicks (unsigned int distance);
+
 };

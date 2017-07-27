@@ -10,6 +10,11 @@ Encoder::Encoder() {
 	start(rightEncoder);
 }
 
+Encoder::~Encoder() {
+  counts[0] = counts [1] = counts[2] = counts[3] = 0;
+  prevTime[0] = prevTime [1] = prevTime[2] = prevTime[3] = 0;
+}
+
 void Encoder::enableExternalInterrupt (unsigned int INTX, unsigned int mode) {
   if (INTX > 3 || mode > 3 || mode == 1) return;
   cli();
@@ -37,12 +42,22 @@ int Encoder::getTicks (unsigned int INTX){
   return counts[INTX];
 }
 
+/* 
+ *  @return value the right encoder has travelled in centimeters
+ */
 int Encoder::getDistanceRightWheel(){
 	return (int) ((counts[rightEncoder] * wheelDiameter * pi) / (gearRatio * 24));
 }
 
+/* 
+ *  @return value the left encoder has travelled in centimeters
+ */
 int Encoder::getDistanceLeftWheel(){
 	return (int) ((counts[leftEncoder] * wheelDiameter * pi) / (gearRatio * 24));
+}
+
+int Encoder::convertDistToTicks (unsigned int distance) {
+  return (int) ((distance * gearRatio * 24) / (wheelDiameter * pi));
 }
 
 ISR(INT0_vect){

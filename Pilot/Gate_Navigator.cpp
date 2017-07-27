@@ -4,11 +4,12 @@
 #include "Encoder.h"
 #include "Gate_Navigator.h"
 
-Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int derivativeGain, int motorSpeed) {
-	threshold = thresholdValue;
-	proportional = proportionalGain;
-	derivative = derivativeGain;
-	speed = motorSpeed;
+Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int derivativeGain, int motorSpeed, int distanceToGate) {
+	thresholdVal = thresholdValue;
+	proportionalVal = proportionalGain;
+	derivativeVal = derivativeGain;
+	speedVal = motorSpeed;
+  distToGateVal = distanceToGate;
 };
 
 /*
@@ -17,7 +18,10 @@ Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int de
 bool Gate_Navigator::Drive() {
   int lastError = 0, recentError = 0;
   int q = 0, m = 0, con = 0;
+  const int minimumTimeToReachCrossBar = 5000;
 
+  Encoder distCalculator = Encoder();
+  
   LCD.clear(); LCD.home();
   LCD.print("Driving");
   delay(1000);
@@ -28,20 +32,29 @@ bool Gate_Navigator::Drive() {
 	  
   	/* Sample the 1 khZ sensor to see if its should stop */
   	bool gateActive = digitalRead (OneKHzSensorPin);
-  	
-  	if (gateActive) {
+    
+    /* The distance that was travelled so far */
+  	int averageDist = (distCalculator.getDistanceRightWheel() + distCalculator.getDistanceLeftWheel()) / 2;
+    
+  	if (gateActive && averageDist > distToGateVal) {
   		motor.speed(leftMotor, 0);
   		motor.speed(rightMotor, 0);
+      LCD.clear(); LCD.home();
+      LCD.print("Gate Active");
+      LCD.setCursor(0,1);
+      LCD.print("Stopping");
   	}
     else {
   		bool 
-  		L = analogRead(leftQRDSensor) > threshold,
-  		CL = analogRead(centreLeftQRDSensor) > threshold,
-  		CR = analogRead(centreRightQRDSensor) > threshold,
-  		R = analogRead(rightQRDSensor) > threshold; 
+  		L = analogRead(leftQRDSensor) > thresholdVal,
+  		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
+  		CR = analogRead(centreRightQRDSensor) > thresholdVal,
+  		R = analogRead(rightQRDSensor) > thresholdVal; 
 
-      if (  (CL && CR) && (R || L)  && (millis() - offset > 5000)) {
-          return true;
+      if (  (CL && CR) && (R || L)  && (millis() - offset > minimumTimeToReachCrossBar)) {
+        motor.speed(leftMotor, 0);
+        motor.speed(rightMotor, 0);
+        return true;
       }
       
   		int error;
@@ -59,23 +72,35 @@ bool Gate_Navigator::Drive() {
   		  m=1;
   		}
   	  
-  		int proportional = proportional * error,
-  			derivative   = (int) (derivative * (float)(error - recentError) / (q + m) );
+  		int proportional = proportionalVal * error,
+  			derivative   = (int) (derivativeVal * (float)(error - recentError) / (q + m) );
   		con = proportional + derivative;
   	  
   		m++;
-  		motor.speed(leftMotor, -speed + con);
-  		motor.speed(rightMotor, speed + con);
+  		motor.speed(leftMotor, -speedVal + con);
+  		motor.speed(rightMotor, speedVal + con);
   	  
   		lastError = error;
 
       LCD.clear(); LCD.home();
-      LCD.print(speed); LCD.print(" "); LCD.print(proportional); 
-      LCD.print(" "); LCD.print(derivative);
+      LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
+      LCD.print(" "); LCD.print(derivativeVal); LCD.print(" "); LCD.print(distToGateVal);
       LCD.setCursor(0,1);
       LCD.print("L "); LCD.print(CL); LCD.print(" R "); LCD.print(CR);
-      
       delay(25);
+
+      if (stopbutton())
+      {
+        delay(100);
+        if (stopbutton())
+        { 
+          LCD.clear(); LCD.home();
+          LCD.print("Exiting");
+          LCD.setCursor(0,1); LCD.print("Drive");
+          delay(500);
+          return false;
+        }
+    }
   	}
 
   }
