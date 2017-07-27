@@ -24,9 +24,11 @@ uint16_t MenuItem::MenuItemCount = 0;
 MenuItem * Speed;
 MenuItem * ProportionalGain;
 MenuItem * DerivativeGain;
-MenuItem * Threshold;
+MenuItem * Threshold; /* Thershold for detecting black line */
 MenuItem * Error;
-MenuItem * menuItems[] = {Speed, ProportionalGain, DerivativeGain, Threshold, Error};
+MenuItem * DistanceToGate; 
+MenuItem * ThresholdGate;
+MenuItem * menuItems[numberOfPIDMenuOptions];
 Gate_Navigator * gateSequence;
 
 // *array[1]
@@ -37,8 +39,82 @@ Gate_Navigator * gateSequence;
  *  switching between the different states
  */
 void Pilot() {
-  gateSequence = new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value);
+  gateSequence = new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value);
   gateSequence->Drive();
+}
+
+void testMenu() {
+  LCD.clear(); LCD.home();
+  LCD.print("Entering");
+  LCD.setCursor(0,1); LCD.print("PID Menu");
+  delay(500);
+
+  while (true) {
+    int menuIndex = map(knob(6), 0, 1023, 0, 1);
+
+    LCD.clear(); LCD.home();
+    switch (menuIndex){
+      case 0:
+        LCD.print("->Gate Encoder");
+        LCD.setCursor(0,1); LCD.print("Other");
+        break;
+      case 1:
+        LCD.print("Gate ->Encoder");
+        LCD.setCursor(0,1); LCD.print("Other");
+        break;
+    }
+    delay(100);
+
+    if (startbutton()) {
+      delay(100);
+      if (startbutton()) { 
+        switch (menuIndex){
+          case 0:
+            testGateSensors();
+            break;
+          case 1:
+            break;
+        }
+      } // if - cross check start button
+    }
+
+    if (stopbutton())
+    {
+      delay(100);
+      if (stopbutton())
+      { 
+        LCD.clear(); LCD.home();
+        LCD.print("Exiting");
+        LCD.setCursor(0,1); LCD.print("Test Menu");
+        delay(500);
+        return;
+      }
+    }
+  }
+}
+
+void testGateSensors() {
+  while(true) {
+    int gateActive = analogRead (OneKHzSensorPin),
+         ziplineNear = analogRead (TenKHzSensorPin);
+
+    LCD.clear(); LCD.home();
+    LCD.print(gateActive); LCD.print(" "); LCD.print(ziplineNear);
+    delay(500);
+
+    if (stopbutton())
+    {
+      delay(100);
+      if (stopbutton())
+      { 
+        LCD.clear(); LCD.home();
+        LCD.print("Exiting");
+        LCD.setCursor(0,1); LCD.print("Gate Test");
+        delay(500);
+        return;
+      }
+    }
+  }
 }
 
 void PIDMenu() {
@@ -49,7 +125,7 @@ void PIDMenu() {
  
   while (true) {
     /* Show MenuItem value and knob value */
-    int menuIndex = map(knob(6), 0, 1023, 0, MenuItem::MenuItemCount); /* Menu items plus the Drive option */
+    int menuIndex = map(knob(6), 0, 1023, 0, numberOfPIDMenuOptions); /* Menu items plus the Drive option */
     
     LCD.clear(); LCD.home();
     LCD.print(menuItems[menuIndex]->Name); LCD.print(" "); LCD.print(menuItems[menuIndex]->Value);
@@ -121,6 +197,7 @@ void mainMenu()
             Pilot();
             break;
           case 2:
+            testMenu();
             break;
         }
       } // if - cross check start button
@@ -142,7 +219,15 @@ void setup()
   DerivativeGain   = new MenuItem("D-gain");
   Threshold        = new MenuItem("Threshold");
   Error            = new MenuItem("Error");
-
+  DistanceToGate   = new MenuItem("GateDist");
+  ThresholdGate    = new MenuItem("ThreshGate");
+  menuItems[0]     = Speed; 
+  menuItems[1]     = ProportionalGain; 
+  menuItems[2]     = DerivativeGain; 
+  menuItems[3]     = Error;
+  menuItems[4]     = Threshold;
+  menuItems[5]     = DistanceToGate;
+  menuItems[6]     = ThresholdGate;
 }
  
 void loop()

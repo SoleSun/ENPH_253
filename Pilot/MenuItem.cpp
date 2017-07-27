@@ -1,6 +1,5 @@
 #include <avr/eeprom.h>
 #include "MenuItem.h"
-#include <Arduino.h>
 
 MenuItem::MenuItem (String menuName) {
 	  MenuItemCount++;
