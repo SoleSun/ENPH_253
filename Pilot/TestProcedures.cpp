@@ -251,14 +251,14 @@ void TestProcedures::testMinMotor() {
 void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDistanceVal,int maneuverLeftConstantVal,int maneuverRightConstantVal,int minMotorSpeedVal){
   while(true){
     maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,minMotorSpeedVal, false);
-  }
-  if (stopbutton()){
-  delay(100);
-    if(stopbutton()){
-      LCD.clear(); LCD.home();
-      LCD.print("Exiting Maneuver Test");
-      delay(500);
-      return;
+    if (stopbutton()){
+      delay(100);
+      if(stopbutton()){
+        LCD.clear(); LCD.home();
+        LCD.print("Exiting Maneuver Test");
+        delay(500);
+        return;
+      }
     }
   }
 }
