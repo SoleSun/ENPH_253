@@ -189,10 +189,9 @@ void TestProcedures::testMinMotor() {
         }
     }
 }
-void TestProcedures::testManeuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverRightConstantVal,maneuverLeftConstantVal,minMotorSpeedVal){
-  RetrivalFSM r = new RetrivalFSM();
+void TestProcedures::testManeuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal,maneuverRightConstantVal,minMotorSpeedVal){
 	while(true){
-		r.maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,minMotorSpeedVal, false);
+		maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,minMotorSpeedVal, false);
 	}
 	if (stopbotton()){
 	delay(100);
