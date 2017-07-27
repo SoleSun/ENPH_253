@@ -1,6 +1,7 @@
 #include "TestProcedures.h"
-#include "RetrivalFSM.h"
 #include "Configuration.h"
+#include "Encoder.h"
+#include "RetrivalFSM.h"
 #include <phys253.h>
 #include <LiquidCrystal.h>
 
@@ -135,10 +136,11 @@ void TestProcedures::testMotors () {
   }
 }
 
-
-void TestProcedures::testLifts() {
+void TestProcedures::testLift() {
   int flag = 0;
   while (true){
+
+    LCD.clear(); LCD.home(); 
     
     if(startbutton()) {
       delay(100);
@@ -154,6 +156,18 @@ void TestProcedures::testLifts() {
         }
       }
     }
+
+    if (!flag) {  
+          LCD.print("Left: 90");
+          LCD.setCursor(0,1);
+          LCD.print("Right: 0");
+        } else {
+          LCD.print("Left: 0");
+          LCD.setCursor(0,1);
+          LCD.print("Right: 180");
+        }
+
+    delay(100);
     
     if (stopbutton())
     {
@@ -167,6 +181,51 @@ void TestProcedures::testLifts() {
           delay(500);
           return;
         }
+    }
+  }
+}
+
+void TestProcedures::testEncoders() {
+  Encoder e;
+
+  LCD.clear(); LCD.home();
+  LCD.print("Encoder Test");
+
+  if(startbutton()) {
+    delay(100);
+    if(startbutton()){
+      while(true) {
+
+        LCD.clear(); LCD.home();
+        
+        LCD.print("Right "); LCD.print(e.getTicks(leftEncoder)); LCD.print(" "); LCD.print(e.getDistanceRightWheel());
+        LCD.setCursor(0,1);
+        LCD.print("Left "); LCD.print(e.getTicks(rightEncoder)); LCD.print(" "); LCD.print(e.getDistanceLeftWheel());
+    
+        if (e.getDistanceRightWheel() > 300 || e.getDistanceLeftWheel() > 300){
+          motor.speed(leftMotor, 0);
+          motor.speed(rightMotor, 0);  
+        } else {
+          int motorSpeed = map (knob(6), 0, 1023, 0, 255);
+        
+          motor.speed(leftMotor, -motorSpeed);
+          motor.speed(rightMotor, motorSpeed);
+        }
+        
+        if (stopbutton())
+        {
+          delay(100);
+          if (stopbutton())
+            { 
+              motor.speed(leftMotor, 0); motor.speed(rightMotor, 0);
+              LCD.clear(); LCD.home();
+              LCD.print("Exiting");
+              LCD.setCursor(0,1); LCD.print("Lift Test");
+              delay(500);
+              return;
+            }
+        }
+      }  
     }
   }
 }
@@ -189,17 +248,18 @@ void TestProcedures::testMinMotor() {
         }
     }
 }
-void TestProcedures::testManeuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal,maneuverRightConstantVal,minMotorSpeedVal){
-	while(true){
-		maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,minMotorSpeedVal, false);
-	}
-	if (stopbotton()){
-	delay(100);
-		if(stopbotton()){
-			LCD.clear(); LCD.home();
-			LCD.print("Exiting Maneuver Test");
-			delay(500);
-			return;
-		}
-	}
+void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDistanceVal,int maneuverLeftConstantVal,int maneuverRightConstantVal,int minMotorSpeedVal){
+  while(true){
+    maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,minMotorSpeedVal, false);
+  }
+  if (stopbutton()){
+  delay(100);
+    if(stopbutton()){
+      LCD.clear(); LCD.home();
+      LCD.print("Exiting Maneuver Test");
+      delay(500);
+      return;
+    }
+  }
 }
+

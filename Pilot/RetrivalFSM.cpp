@@ -20,11 +20,10 @@ int motorSpeed;
 // agents servoPositions:
 int armDownPositions[6] = {144, 140,146,144,140,146};
 
+
 States g_CurrentState = S_TapeFollow; 
 
-void executeRetrivalFSM(int armDownPositions [6], int p, int d, int QRDthreshold, int MotorSpeed){
- 
-	g_CurrentState = S_TapeFollow;
+void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
 	bool fsmDone = false;
 	Claw newClaw(CLAWOPENPOSITION, CLAWCLOSEPOSITION, ARMUPPOSITION,CLAWDELAY, ARMDELAY, CLAWPIN, ARMPIN); 
 	int counter = 0;
@@ -221,7 +220,7 @@ void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, 
 
         #ifdef DEBUG
 		LCD.home();
-		LCD.print("leftMotorSpeed:"), LCD.print(" "), LCD.print(leftSpeed));
+		LCD.print("leftMotorSpeed:"), LCD.print(" "), LCD.print(leftSpeed);
 		LCD.setCursor(0,1);
         LCD.print("rightMotorSpeed:"), LCD.print(" "), LCD.print(rightSpeed);
         delay(50);

@@ -4,13 +4,14 @@
 #include "Encoder.h"
 #include "Gate_Navigator.h"
 
-Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int derivativeGain, int motorSpeed, int distanceToGate, int threshGate) {
+Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int derivativeGain, int motorSpeed, int distanceToGate, int threshGate/*, int distanceAfterGate*/) {
 	thresholdVal = thresholdValue;
 	proportionalVal = proportionalGain;
 	derivativeVal = derivativeGain;
 	speedVal = motorSpeed;
   distToGateVal = distanceToGate;
   threshGateVal = threshGate;
+  //distanceAfterGateVal = distanceAfterGate;
 };
 
 /*
@@ -19,7 +20,7 @@ Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int de
 bool Gate_Navigator::Drive() {
   int lastError = 0, recentError = 0;
   int q = 0, m = 0, con = 0;
-  const int minimumTimeToReachCrossBar = 5000;
+  const int minimumTimeToReachCrossBar = 8000;
 
   Encoder distCalculator = Encoder();
   
@@ -28,31 +29,44 @@ bool Gate_Navigator::Drive() {
   delay(1000);
   
   unsigned long offset = millis();
+
+  /* Has the robot stopped at least once before the gate */
+  bool stoppedOnce = false;
   
   while (true){
-	  
-  	/* Sample the 1 khZ sensor to see if its should stop */
-  	bool doNotGo = analogRead (OneKHzSensorPin) < threshGateVal;
+
+    LCD.clear(); LCD.home();
     
     /* The distance that was travelled so far */
   	int averageDist = (distCalculator.getDistanceRightWheel() + distCalculator.getDistanceLeftWheel()) / 2;
-    
-  	if (doNotGo && averageDist > distToGateVal) {
+      
+    /* If the beacon is not flashing 1 KHz and the robot has already travelled its allotted safe distance */
+  	if (analogRead (OneKHzSensorPin) > threshGateVal && averageDist > distToGateVal && !stoppedOnce) {
+  		/* Stop the robot */
   		motor.speed(leftMotor, 0);
   		motor.speed(rightMotor, 0);
-      LCD.clear(); LCD.home();
-      LCD.print("Gate Active");
-      LCD.setCursor(0,1);
-      LCD.print("Stopping");
+      stoppedOnce = true;
+
+      while (analogRead(OneKHzSensorPin) > threshGateVal){
+        LCD.print(averageDist); LCD.print(" "); LCD.print(analogRead (OneKHzSensorPin));
+        LCD.setCursor(0,1);
+        LCD.print("Stopping");
+      }
+
+      motor.speed(leftMotor, -255);
+      motor.speed(rightMotor, 255);
+      delay(30);
   	}
     else {
-  		bool 
-  		L = analogRead(leftQRDSensor) > thresholdVal,
-  		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
-  		CR = analogRead(centreRightQRDSensor) > thresholdVal,
-  		R = analogRead(rightQRDSensor) > thresholdVal; 
-
+      /* Check the QRD sensors */
+      bool 
+        L = analogRead(leftQRDSensor) > thresholdVal,
+        CL = analogRead(centreLeftQRDSensor) > thresholdVal,
+        CR = analogRead(centreRightQRDSensor) > thresholdVal,
+        R = analogRead(rightQRDSensor) > thresholdVal; 
+        
       if (  (CL && CR) && (R || L)  && (millis() - offset > minimumTimeToReachCrossBar)) {
+        LCD.print("Cross"); LCD.setCursor(0,1); LCD.print("Detected");
         motor.speed(leftMotor, 0);
         motor.speed(rightMotor, 0);
         return true;
@@ -83,14 +97,14 @@ bool Gate_Navigator::Drive() {
   	  
   		lastError = error;
 
-      LCD.clear(); LCD.home();
       LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
       LCD.print(" "); LCD.print(derivativeVal); LCD.print(" "); LCD.print(distToGateVal);
       LCD.setCursor(0,1);
-      LCD.print("L "); LCD.print(CL); LCD.print(" R "); LCD.print(CR);
+      LCD.print("L "); LCD.print(CL); LCD.print(" R "); LCD.print(CR); LCD.print("IR"); LCD.print(analogRead(OneKHzSensorPin));
       delay(25);
+  	}
 
-      if (stopbutton())
+    if (stopbutton())
       {
         delay(100);
         if (stopbutton())
@@ -102,7 +116,6 @@ bool Gate_Navigator::Drive() {
           return false;
         }
       }
-  	}
 
   }
 };

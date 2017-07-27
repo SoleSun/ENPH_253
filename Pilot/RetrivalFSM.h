@@ -1,8 +1,8 @@
-# pragma once
-# include "ClawTINAH.h"
-# include "configuration.h"
-# include "Gate_Navigator.h"
-# include "Encoder.h"
+#pragma once
+#include "ClawTINAH.h"
+#include "configuration.h"
+#include "Gate_Navigator.h"
+#include "Encoder.h"
 
 //Method BreakDown:
 /*
@@ -58,4 +58,5 @@ const bool backOnTape();
 void exit();
 
  void tapeFollow();
+
 void maneuver(int leftTargetDistance, int rightTargetDistance, int  leftConstant, int rightConstant, int minimumMotorSpeed, bool reverse);
