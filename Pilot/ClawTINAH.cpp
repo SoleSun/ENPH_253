@@ -4,7 +4,6 @@
 Claw::Claw(int clawOpenPosition, int clawClosePosition, int armUpPosition, int clawStepDelay,
 int armStepDelay, int clawPin, int armPin) {
     //open the claw. As well as set up all the various constants.
-    //ask TA about attaching multiple Servos
     p_clawOpenPosition = clawOpenPosition;
     p_clawClosePosition = clawClosePosition;
     p_armUpPosition = armUpPosition;
@@ -12,8 +11,6 @@ int armStepDelay, int clawPin, int armPin) {
     p_armStepDelay = armStepDelay;
 
      //servos
-    /*ServoTINAH p_claw;
-    ServoTINAH p_arm;*/
     p_claw = new ServoTINAH;
     p_arm = new ServoTINAH;
     

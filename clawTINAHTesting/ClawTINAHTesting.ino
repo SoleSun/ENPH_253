@@ -5,13 +5,13 @@
 #define ARM_SERVO_PIN 9
 #define CLAW_SERVO_PIN 8
 
-#define CLAW_SERVO_OPEN 130
-#define CLAW_SERVO_CLOSE 0
-#define CLAW_SERVO_DELAY_MS 10
+#define CLAW_SERVO_OPEN 150
+#define CLAW_SERVO_CLOSE 50
+#define CLAW_SERVO_DELAY_MS 2
 
 #define ARM_SERVO_UP 0
 #define ARM_SERVO_DOWN 150
-#define ARM_SERVO_DELAY_MS 15
+#define ARM_SERVO_DELAY_MS 5
 
 
 Claw * newClaw;
@@ -30,11 +30,24 @@ void loop() {
     
     // 
     LCD.home();
-    LCD.print("twoAnimal");
+
+    LCD.print("Select");
     delay(2000);
+    LCD.clear();
     //    delay(2000);
-    //newClaw ->clawSetUp();
-        newClaw->retrieve(ARM_SERVO_DOWN);
+
+    if(startbutton() )
+    {
+          LCD.print("Setup");
+          delay(500);
+         newClaw ->clawSetUp();
+    }else if(stopbutton()){
+        LCD.print("Running");
+         delay(500);
+          newClaw->retrieve(ARM_SERVO_DOWN);
+    }
+   
+     
         LCD.clear();
   delay(2000);
 

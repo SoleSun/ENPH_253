@@ -4,12 +4,14 @@
 
 class Claw {
 public:
+// important functions
     Claw(int clawOpenPosition, int clawClosePosition, int armUpPosition, int clawStepDelay,
 int armStepDelay, int clawPin, int armPin);
     void retrieve(int);
     void clawSetUp();
+    void armDown();
     
-    
+ // can ignore this
     Claw(const Claw &);
     Claw();
     ~Claw();
@@ -27,11 +29,15 @@ private:
     ServoTINAH *p_claw;
     ServoTINAH *p_arm;
 
+//other functions
     void clawOpen();
     void clawClose();
-    void armDown();
     void armUp();
 };
+
+//public function that can be accessed anywhere:
+
+
 
 void moveServo(ServoTINAH *servo, int startPos, int endPos, int stepDelayMs);
 

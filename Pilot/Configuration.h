@@ -6,6 +6,7 @@
 #define OneKHzSensorPin 5
 #define TenKHzSensorPin 6
 
+// QRD sensors
 #define leftQRDSensor 0
 #define centreLeftQRDSensor 1
 #define centreRightQRDSensor 2
@@ -26,12 +27,13 @@
 
 
 //Retrival Agent Arm
-#define armPin 9
-#define armUpPosition 150
-#define armDelay 15 
+#define ARMPIN 9
+#define ARMUPPOSITION 0
+#define ARMDELAY 5
+#define HANDOFFPOSITION 150
 
 // Retrival Agent Claw
-#define	clawPin 8
-#define clawClosePosition 0
-#define clawOpenPosition 130
-#define clawDelay 10
+#define	CLAWPIN 8
+#define CLAWOPENPOSITION 150
+#define CLAWCLOSEPOSITION 50
+#define CLAWDELAY 2
