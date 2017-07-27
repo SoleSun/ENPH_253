@@ -4,12 +4,13 @@
 #include "Encoder.h"
 #include "Gate_Navigator.h"
 
-Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int derivativeGain, int motorSpeed, int distanceToGate) {
+Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int derivativeGain, int motorSpeed, int distanceToGate, int threshGate) {
 	thresholdVal = thresholdValue;
 	proportionalVal = proportionalGain;
 	derivativeVal = derivativeGain;
 	speedVal = motorSpeed;
   distToGateVal = distanceToGate;
+  threshGateVal = threshGate;
 };
 
 /*
@@ -31,12 +32,12 @@ bool Gate_Navigator::Drive() {
   while (true){
 	  
   	/* Sample the 1 khZ sensor to see if its should stop */
-  	bool gateActive = digitalRead (OneKHzSensorPin);
+  	bool doNotGo = analogRead (OneKHzSensorPin) < threshGateVal;
     
     /* The distance that was travelled so far */
   	int averageDist = (distCalculator.getDistanceRightWheel() + distCalculator.getDistanceLeftWheel()) / 2;
     
-  	if (gateActive && averageDist > distToGateVal) {
+  	if (doNotGo && averageDist > distToGateVal) {
   		motor.speed(leftMotor, 0);
   		motor.speed(rightMotor, 0);
       LCD.clear(); LCD.home();
@@ -100,7 +101,7 @@ bool Gate_Navigator::Drive() {
           delay(500);
           return false;
         }
-    }
+      }
   	}
 
   }
