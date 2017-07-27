@@ -3,7 +3,7 @@
 
 /* Menu Options */
 #define numberOfMainMenuOptions 3
-#define numberOfPIDMenuOptions 7
+#define numberOfPIDMenuOptions 13
 
 /* Gate Sensor Pins */
 #define OneKHzSensorPin 4
@@ -28,15 +28,3 @@
 
 /* Mathematical constants */
 #define pi 3.141592653
-
-//Retrival Agent Arm        
- #define ARMPIN 9      
- #define ARMUPPOSITION 0       
- #define ARMDELAY 5        
- #define HANDOFFPOSITION 150       
-       
- // Retrival Agent Claw        
- #define   CLAWPIN 8       
- #define CLAWOPENPOSITION 150      
- #define CLAWCLOSEPOSITION 50      
- #define CLAWDELAY 2

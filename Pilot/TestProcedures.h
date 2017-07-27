@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 
 class TestProcedures {
@@ -9,7 +8,8 @@ class TestProcedures {
 		void testGateSensors();
 		void testPID (int thresholdVal, int proportionalVal, int derivativeVal, int speedVal);
     void testMotors ();
-    void testLifts ();
-    void testMinMotor ();
+    void testLift ();
+    void testEncoders();
+    void testMinMotor();
     void testManeuver (int leftTargetDistance, int rightTargetDistance, int maneuverLeftConstant, int maneuverRightConstant, int minMotorSpeed);
 };
