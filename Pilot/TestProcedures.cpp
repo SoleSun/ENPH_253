@@ -169,3 +169,22 @@ void TestProcedures::testLifts() {
   }
 }
 
+void TestProcedures::testMinMotor() {
+    
+    LCD.clear(); LCD.home();
+    LCD.print("Testing Min Speed");
+    delay(500);
+    
+    while(true){
+        
+        int motorSpeed = map (knob(6), 0, 1023, 0, 255);
+        motor.speed(leftMotor, -motorSpeed);
+        motor.speed(rightMotor, motorSpeed);
+        LCD.clear(); LCD.print(motorSpeed);
+        delay(100);
+        
+        if(stopbutton()){
+            return;
+        }
+    }
+}
