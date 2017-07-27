@@ -35,6 +35,8 @@ Claw::~Claw() {
 void Claw::retrieve(int armDownPosition){
     //retrieve motion
     p_armDownPosition = armDownPosition;
+
+
     
     // grabbing the agent
     this->armDown();
@@ -53,7 +55,15 @@ void Claw::clawSetUp(){
 
      p_claw->write(p_clawOpenPosition);
     p_arm->write(p_armUpPosition);
-    
+
+    LCD.clear();
+    LCD.home();
+    LCD.print("ArmUp:"); LCD.print(p_armUpPosition); 
+    delay(1000);
+    LCD.setCursor(0,1);
+    LCD.print("clawOpen"); LCD.print(p_clawOpenPosition);
+    delay(1000);
+     
 }
 
 
@@ -92,4 +102,5 @@ void moveServo(ServoTINAH *servo, int startPos, int endPos, int stepDelayMs) {
         delay(10);
         LCD.clear();
     }
+    delay(2000);
 }
