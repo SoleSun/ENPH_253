@@ -1,7 +1,7 @@
 /*
  * Lift.h - Header file for the lifting mechnism 
  */
-
+#pragma once
  #ifndef Lift_h
  #define Lift_h
 
