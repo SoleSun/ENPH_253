@@ -24,11 +24,10 @@
 
 /* From the small wheel to the large */
 #define gearRatio 3
-#define wheelDiameter 7
+#define wheelDiameter 7.7
 
 /* Mathematical constants */
 #define pi 3.141592653
-
 
 //Retrival Agent Arm		
  #define ARMPIN 9		

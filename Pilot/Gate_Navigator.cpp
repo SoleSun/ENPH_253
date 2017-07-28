@@ -27,11 +27,13 @@ bool Gate_Navigator::Drive() {
   LCD.clear(); LCD.home();
   LCD.print("Driving");
   delay(1000);
-  
-  unsigned long offset = millis();
+
+  unsigned long offset = millis(), stuck = millis();
 
   /* Has the robot stopped at least once before the gate */
   bool stoppedOnce = false;
+
+  unsigned long noOfRightTicks = 0, noOfLeftTicks = 0;
   
   while (true){
 
@@ -63,14 +65,28 @@ bool Gate_Navigator::Drive() {
         L = analogRead(leftQRDSensor) > thresholdVal,
         CL = analogRead(centreLeftQRDSensor) > thresholdVal,
         CR = analogRead(centreRightQRDSensor) > thresholdVal,
-        R = analogRead(rightQRDSensor) > thresholdVal; 
-        
+        R = analogRead(rightQRDSensor) > thresholdVal;
+      
       if (  (CL && CR) && (R || L)  && (millis() - offset > minimumTimeToReachCrossBar)) {
         LCD.print("Cross"); LCD.setCursor(0,1); LCD.print("Detected");
         motor.speed(leftMotor, 0);
         motor.speed(rightMotor, 0);
         return true;
       }
+
+      unsigned long
+      newNoOfRightTicks =  distCalculator.getTicks(rightEncoder),
+      newNoOfLeftTicks  = distCalculator.getTicks(leftEncoder);
+
+      /* Ticks have not been generated for the last two seconds, accelerate*/
+      if ((newNoOfRightTicks - noOfRightTicks < 5 || newNoOfLeftTicks - noOfLeftTicks < 5) && (stuck - millis() > 2000)){
+        motor.speed(-leftMotor, -255);
+        motor.speed(rightMotor, 255);
+        stuck = millis();
+        delay(25);
+      }
+      
+      noOfRightTicks = newNoOfRightTicks; noOfLeftTicks = newNoOfLeftTicks;
       
   		int error;
   		if ( CL && CR )       error = 0;

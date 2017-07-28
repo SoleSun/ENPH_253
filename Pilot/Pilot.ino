@@ -33,7 +33,7 @@ MenuItem * ThresholdGate;
 MenuItem * LeftTargetDistanceValue;
 MenuItem * RightTargetDistanceValue;
 MenuItem * ManeuverLeftConstant;
-MenuItem * ManeuverRightConstant;
+MenuItem * ManuveRightConstant;
 MenuItem * MinMotorSpeed;
 MenuItem * menuItems[numberOfPIDMenuOptions];
 Gate_Navigator * gateSequence;
@@ -58,8 +58,7 @@ void testMenu() {
   LCD.setCursor(0,1); LCD.print("Test Menu");
   delay(500);
 
-
-  const int noOfTestOptions = 7; 
+  const int noOfTestOptions = 6; 
   
   TestProcedures t = TestProcedures (); 
   
@@ -85,13 +84,20 @@ void testMenu() {
         LCD.setCursor(0,1); LCD.print("Motor >Lift");
         break;
       case 4:
-        LCD.print(">Encoder");
+        LCD.print(">Encoder Acc");
+        LCD.setCursor(0,1); LCD.print("MinMotor Maneuver") 
         break;
       case 5:
-        LCD.print(">MinMotor Maneuver"); 
+        LCD.print("Encoder >Acc");
+        LCD.setCursor(0,1); LCD.print("MinMotor Maneuver") 
         break;
-      case 6: 
-        LCD.print("MinMotor >Maneuver");
+      case 6:
+        LCD.print("Encoder Acc");
+        LCD.setCursor(0,1); LCD.print(">MinMotor Maneuver") 
+        break;
+      case 7: 
+        LCD.print("Encoder Acc");
+        LCD.setCursor(0,1); LCD.print("MinMotor >Maneuver")
         break;
     }
     delay(100);
@@ -110,17 +116,18 @@ void testMenu() {
             t.testMotors();
             break;
           case 3:
-
-//            t.testLifts();
+            t.testLift();
             break;
           case 4:
             t.testEncoders();
             break;
-          
-          case 5: 
+          case 5:
+            t.testAccelerate(Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value);
+            break;
+          case 6: 
            t.testMinMotor();
            break;
-          case 6:
+          case 7:
             t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,MinMotorSpeed->Value);
             break;
         }
@@ -239,21 +246,19 @@ void setup()
   delay(1000);
   Serial.begin(9600);
 
-  Speed             = new MenuItem("Speed");
-  ProportionalGain  = new MenuItem("P-gain");
-  DerivativeGain    = new MenuItem("D-gain");
-  Threshold         = new MenuItem("Threshold");
-  Error             = new MenuItem("Error");
-  DistanceToGate    = new MenuItem("GateDist");
-  DistanceAfterGate = new MenuItem("PostGateDist");
-  ThresholdGate     = new MenuItem("ThreshGate");
-  
-  LeftTargetDistanceValue = new MenuItem("LTargetD");
-  RightTargetDistanceValue = new MenuItem("RTargetD");
-  ManeuverLeftConstant = new MenuItem("LeftP");
-  ManeuverRightConstant = new MenuItem("RightP");
-  MinMotorSpeed = new MenuItem("MinMotorV");
-  
+  Speed                    = new MenuItem("Speed");
+  ProportionalGain         = new MenuItem("P-gain");
+  DerivativeGain           = new MenuItem("D-gain");
+  Threshold                = new MenuItem("Threshold");
+  Error                    = new MenuItem("Error");
+  DistanceToGate           = new MenuItem("GateDist");
+  DistanceAfterGate        = new MenuItem("PostGateDist");
+  ThresholdGate            = new MenuItem("ThreshGate");
+  LeftTargetDistanceValue  = new MenuItem("LeftTargetDistance");
+  RightTargetDistanceValue = new MenuItem("RightTargetDistance");
+  ManeuverLeftConstant     = new MenuItem("LeftManeuverP");
+  ManeuverRightConstant    = new MenuItem("RightManeuverP");
+  MinMotorSpeed            = new MenuItem("MinMotorSpeed");
   
   menuItems[0]      = Speed; 
   menuItems[1]      = ProportionalGain; 
@@ -263,13 +268,11 @@ void setup()
   menuItems[5]      = DistanceToGate;
   menuItems[6]      = ThresholdGate;
   menuItems[7]      = DistanceAfterGate;
-  
   menuItems[8]      = LeftTargetDistanceValue;
-  menuItems[9]      = RightTargetDistanceValue;
+  menuItems[9]      = RigtTargetDistanceValue;
   menuItems[10]     = ManeuverLeftConstant;
   menuItems[11]     = ManeuverRightConstant;
   menuItems[12]     = MinMotorSpeed;
-
 }
  
 void loop()
