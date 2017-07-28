@@ -58,7 +58,7 @@ void testMenu() {
   LCD.setCursor(0,1); LCD.print("Test Menu");
   delay(500);
 
-  const int noOfTestOptions = 8; 
+  const int noOfTestOptions = 7; 
   
   TestProcedures t = TestProcedures (); 
   
