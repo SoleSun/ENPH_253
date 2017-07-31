@@ -7,19 +7,11 @@
 #include <LiquidCrystal.h>
 #include <avr/eeprom.h>
 #include <avr/interrupt.h>
-<<<<<<< HEAD
 #include "include/Configuration.h"
 #include "include/MenuItem.h"
 #include "include/Encoder.h"
 #include "include/Gate_Navigator.h"
 #include "include/TestProcedures.h"
-=======
-#include "Configuration.h"
-#include "MenuItem.h"
-#include "Encoder.h"
-#include "Gate_Navigator.h"
-#include "TestProcedures.h"
->>>>>>> 3df4dbc030fe0c0648df8af69a0aaaaddf1a7d71
 
 /*
  * A cross is black tape that crosses the path, indicating either the entrance

@@ -79,11 +79,7 @@ bool Gate_Navigator::Drive() {
       newNoOfLeftTicks  = distCalculator.getTicks(leftEncoder);
 
       /* Ticks have not been generated for the last two seconds, accelerate*/
-<<<<<<< HEAD
       if ((newNoOfRightTicks - noOfRightTicks < 2 || newNoOfLeftTicks - noOfLeftTicks < 2) && (stuck - millis() > 2000)){
-=======
-      if ((newNoOfRightTicks - noOfRightTicks < 5 || newNoOfLeftTicks - noOfLeftTicks < 5) && (stuck - millis() > 2000)){
->>>>>>> 3df4dbc030fe0c0648df8af69a0aaaaddf1a7d71
         motor.speed(-leftMotor, -255);
         motor.speed(rightMotor, 255);
         stuck = millis();
@@ -101,11 +97,7 @@ bool Gate_Navigator::Drive() {
   		   else                 error = -2;
   		}
   	  
-<<<<<<< HEAD
   		if(error != lastError){
-=======
-  		if(!(error == lastError)){
->>>>>>> 3df4dbc030fe0c0648df8af69a0aaaaddf1a7d71
   		  recentError = lastError;
   		  q=m;
   		  m=1;
@@ -142,8 +134,4 @@ bool Gate_Navigator::Drive() {
       }
 
   }
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 3df4dbc030fe0c0648df8af69a0aaaaddf1a7d71

@@ -32,8 +32,4 @@ void Lift::LiftDown(){
     delay(15);
 
 }
-<<<<<<< HEAD
 
-=======
-
->>>>>>> 3df4dbc030fe0c0648df8af69a0aaaaddf1a7d71
