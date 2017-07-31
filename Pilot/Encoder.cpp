@@ -90,4 +90,8 @@ ISR(INT3_vect){
     counts[3]++;
     prevTime[3] = millis();
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 3df4dbc030fe0c0648df8af69a0aaaaddf1a7d71

@@ -10,4 +10,8 @@ MenuItem::MenuItem (String menuName) {
 
 void MenuItem::Save() {
     eeprom_write_word(EEPROMAddress, Value);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 3df4dbc030fe0c0648df8af69a0aaaaddf1a7d71
