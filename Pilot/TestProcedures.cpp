@@ -353,3 +353,53 @@ void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDista
   }
 }
 
+// Teseting procedure for Claw:
+void TestProcedures:: clawTesting(){
+
+////Retrival Agent Arm        
+// #define ARMPIN 9       
+// #define ARMUPPOSITION 0        
+// #define ARMDELAY 5     
+// #define HANDOFFPOSITION 150        
+//        
+// // Retrival Agent Claw     
+// #define    CLAWPIN 8       
+// #define CLAWOPENPOSITION 150       
+// #define CLAWCLOSEPOSITION 50       
+// #define CLAWDELAY 2
+
+ 
+    int armDownPosition = 0; 
+    Claw newClaw(CLAWOPENPOSITION, CLAWCLOSEPOSITION,ARMUPPOSITION ,CLAWDELAY,ARMDELAY,CLAWPIN,ARMPIN);
+    while(true){
+            int armDownDegree = 0; 
+
+        while(!startbutton()){
+            LCD.home();
+            armDownDegree = map(knob(6), 0, 1024, 0, 170);
+            LCD.print(armDownDegree);
+y            delay(100);
+            LCD.clear(); 
+        }
+   
+        // select to quit or run the test
+        LCD.home();
+        LCD.print("Select");
+        delay(2000);
+        LCD.clear();
+
+        if(startbutton()){
+            LCD.print("Running");
+            delay(500);
+            LCD.clear();
+            newClaw.retrieve(armDownDegree);
+        }else if (stopbutton()){
+            LCD.print("quiting");
+            LCD.clear();
+            delay(500);
+            return;
+        }
+        delay(1000);
+        }
+}
+

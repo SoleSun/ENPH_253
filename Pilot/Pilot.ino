@@ -58,7 +58,7 @@ void testMenu() {
   LCD.setCursor(0,1); LCD.print("Test Menu");
   delay(500);
 
-  const int noOfTestOptions = 8; 
+  const int noOfTestOptions = 9; 
   
   TestProcedures t = TestProcedures (); 
   
@@ -99,6 +99,11 @@ void testMenu() {
         LCD.print("Encoder Acc");
         LCD.setCursor(0,1); LCD.print("MinMotor >Maneuver");
         break;
+      case 8:
+        LCD.print("Claw");
+        break; 
+        
+
     }
     delay(100);
 
@@ -130,6 +135,8 @@ void testMenu() {
           case 7:
             t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,MinMotorSpeed->Value);
             break;
+          case 8:
+            t.clawTesting();
         }
       } // if - cross check start button
     }
