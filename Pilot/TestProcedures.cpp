@@ -88,7 +88,7 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
   		LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
   		LCD.print(" "); LCD.print(derivativeVal);
   		LCD.setCursor(0,1);
-  		LCD.print("L "); LCD.print(CL); LCD.print(" R "); LCD.print(CR);
+  		LCD.print("L "); LCD.print(analogRead(centreLeftQRDSensor)); LCD.print(" R "); LCD.print(analogRead(centreRightQRDSensor));
   		delay(25);
   	}
 
