@@ -14,8 +14,8 @@ int proportional;
 int derivative; 
 int threshold; 
 int motorSpeed; 
- int lastError = 0, recentError = 0;
-    int q = 0, m = 0, con = 0; 
+int lastError = 0, recentError = 0;
+int q = 0, m = 0, con = 0; 
 
 // agents servoPositions:
 int armDownPositions[6] = {144, 140,146,144,140,146};
@@ -28,12 +28,11 @@ void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
 	Claw newClaw(CLAWOPENPOSITION, CLAWCLOSEPOSITION, ARMUPPOSITION,CLAWDELAY, ARMDELAY, CLAWPIN, ARMPIN); 
 	int counter = 0;
 	
-	// PID: 
-	
+	// PID: 	
     proportional = p;
     derivative = d;
-    threshold = threshold;
-    motorSpeed = motorSpeed; 
+    threshold = QRDthreshold;
+    motorSpeed = MotorSpeed; 
     
 	
 	while(!fsmDone){

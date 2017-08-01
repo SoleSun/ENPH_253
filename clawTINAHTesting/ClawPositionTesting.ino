@@ -6,7 +6,7 @@
 #define CLAW_SERVO_PIN 8
 
 #define CLAW_SERVO_OPEN 150
-#define CLAW_SERVO_CLOSE 30
+#define CLAW_SERVO_CLOSE 20
 #define CLAW_SERVO_DELAY_MS 2
 
 #define ARM_SERVO_UP 0
