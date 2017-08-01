@@ -1,5 +1,5 @@
 #include <phys253.h>
-#include "Lift.h"
+#include "include/Lift.h"
 
 Lift::Lift(int LeftServoPin, int RightServoPin){
   

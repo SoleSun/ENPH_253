@@ -1,6 +1,6 @@
 #pragma once
 #include "ClawTINAH.h"
-#include "configuration.h"
+#include "Configuration.h"
 #include "Gate_Navigator.h"
 #include "Encoder.h"
 

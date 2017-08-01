@@ -11,11 +11,5 @@ class Gate_Navigator {
 		bool Drive (); 
 		
 		//Getter methods
-		int getThresholdValue ();
-		
-		int getProportionalGainValue ();
-		
-		int getDerivativeGainValue();
-		
-		int getMotorSpeedValue();
+		int getErrorValue(int prevError); 
 };

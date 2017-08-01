@@ -1,6 +1,6 @@
 #include <phys253.h>
 #include <LiquidCrystal.h>
-#include "Zipline_Navigator.h"
+#include "include/Zipline_Navigator.h"
 
 Zipline_Navigator::Zipline_Navigator (int thresh, int p, int d, int speed, int dist, int degree){
 	thresholdVal = thresh;
@@ -85,4 +85,3 @@ void Zipline_Navigator::maneuver() {
 	Encoder angleCalculator = Encoder ();
 	
 }
-

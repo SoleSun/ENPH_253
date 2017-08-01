@@ -1,7 +1,7 @@
-#include "TestProcedures.h"
-#include "Configuration.h"
-#include "Encoder.h"
-#include "RetrivalFSM.h"
+#include "include/TestProcedures.h"
+#include "include/Configuration.h"
+#include "include/Encoder.h"
+#include "include/RetrivalFSM.h"
 #include <phys253.h>
 #include <LiquidCrystal.h>
 
@@ -42,7 +42,7 @@ void TestProcedures::testGateSensors () {
 void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivativeVal, int speedVal) {
 	int lastError = 0, recentError = 0;
 	int q = 0, m = 0, con = 0;
-	
+  
 	LCD.clear(); LCD.home();
 	LCD.print("Driving");
 	delay(1000);
@@ -58,7 +58,7 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
       motor.speed(leftMotor, -speedVal + con);
       motor.speed(rightMotor, speedVal + con);  
     }
-    else {
+    else {  
   		int error;
   		if ( CL && CR )       error = 0;
   		else if ( CL && !CR )    error = -1;
@@ -106,6 +106,95 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
         }
     }
 	}
+}
+
+void TestProcedures::testAccelerate(int thresholdVal, int proportionalVal, int derivativeVal, int speedVal) {
+  int lastError = 0, recentError = 0;
+  int q = 0, m = 0, con = 0;
+
+  Encoder distCalculator = Encoder ();
+  
+  LCD.clear(); LCD.home();
+  LCD.print("Driving");
+  delay(1000);
+
+  unsigned long noOfRightTicks = 0, noOfLeftTicks = 0;
+  unsigned long stuck = millis();
+  
+  while (true) {
+    bool 
+    L = analogRead(leftQRDSensor) > thresholdVal,
+    CL = analogRead(centreLeftQRDSensor) > thresholdVal,
+    CR = analogRead(centreRightQRDSensor) > thresholdVal,
+    R = analogRead(rightQRDSensor) > thresholdVal; 
+
+    if (L && CL && CR && R) {
+      motor.speed(leftMotor, -speedVal + con);
+      motor.speed(rightMotor, speedVal + con);  
+    }
+    else {
+
+      unsigned long
+      newNoOfRightTicks =  distCalculator.getTicks(rightEncoder),
+      newNoOfLeftTicks  = distCalculator.getTicks(leftEncoder);
+
+      /* Ticks have not been generated for the last two seconds, accelerate*/
+      if ((newNoOfRightTicks - noOfRightTicks < 5 || newNoOfLeftTicks - noOfLeftTicks < 5) && (stuck - millis() > 2000)){
+        motor.speed(-leftMotor, -255);
+        motor.speed(rightMotor, 255);
+        stuck = millis();
+        delay(25);
+      }
+      
+      noOfRightTicks = newNoOfRightTicks; noOfLeftTicks = newNoOfLeftTicks;
+      
+      int error;
+      if ( CL && CR )       error = 0;
+      else if ( CL && !CR )    error = -1;
+      else if ( !CL && CR )    error = 1;
+      else{
+         if( lastError > 0 )    error = 2;
+         else                 error = -2;
+      }
+  
+      if(!(error == lastError)){
+        recentError = lastError;
+        q=m;
+        m=1;
+      }
+  
+      int proportional = proportionalVal * error,
+        derivative   = (int) (derivativeVal * (float)(error - recentError) / (q + m) );
+      con = proportional + derivative;
+  
+      m++;
+      motor.speed(leftMotor, -speedVal + con);
+      motor.speed(rightMotor, speedVal + con);
+  
+      lastError = error;
+  
+      LCD.clear(); LCD.home();
+      LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
+      LCD.print(" "); LCD.print(derivativeVal);
+      LCD.setCursor(0,1);
+      LCD.print("L "); LCD.print(CL); LCD.print(" R "); LCD.print(CR);
+      delay(25);
+    }
+
+    if (stopbutton())
+    {
+      delay(100);
+      if (stopbutton())
+        { 
+          motor.speed(leftMotor, 0); motor.speed(rightMotor, 0);
+          LCD.clear(); LCD.home();
+          LCD.print("Exiting");
+          LCD.setCursor(0,1); LCD.print("Drive");
+          delay(500);
+          return;
+        }
+    }
+  }
 }
 
 void TestProcedures::testMotors () {
@@ -186,7 +275,7 @@ void TestProcedures::testLift() {
 }
 
 void TestProcedures::testEncoders() {
-  Encoder e;
+  Encoder e = Encoder ();
 
   LCD.clear(); LCD.home();
   LCD.print("Encoder Test");
@@ -230,6 +319,7 @@ void TestProcedures::testEncoders() {
   }
 }
 
+
 void TestProcedures::testMinMotor() {
     
     LCD.clear(); LCD.home();
@@ -251,14 +341,14 @@ void TestProcedures::testMinMotor() {
 void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDistanceVal,int maneuverLeftConstantVal,int maneuverRightConstantVal,int minMotorSpeedVal){
   while(true){
     maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,minMotorSpeedVal, false);
-  }
-  if (stopbutton()){
-  delay(100);
-    if(stopbutton()){
-      LCD.clear(); LCD.home();
-      LCD.print("Exiting Maneuver Test");
-      delay(500);
-      return;
+    if (stopbutton()){
+      delay(100);
+      if(stopbutton()){
+        LCD.clear(); LCD.home();
+        LCD.print("Exiting Maneuver Test");
+        delay(500);
+        return;
+      }
     }
   }
 }

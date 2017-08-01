@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Encoder.h"
 #include "Configuration.h"
 

@@ -1,5 +1,4 @@
-#include "ClawTINAH.h"
-
+#include "include/ClawTINAH.h"
     
 Claw::Claw(int clawOpenPosition, int clawClosePosition, int armUpPosition, int clawStepDelay,
 int armStepDelay, int clawPin, int armPin) {

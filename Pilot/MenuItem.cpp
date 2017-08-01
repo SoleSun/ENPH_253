@@ -1,5 +1,5 @@
 #include <avr/eeprom.h>
-#include "MenuItem.h"
+#include "include/MenuItem.h"
 
 MenuItem::MenuItem (String menuName) {
 	  MenuItemCount++;
@@ -11,3 +11,4 @@ MenuItem::MenuItem (String menuName) {
 void MenuItem::Save() {
     eeprom_write_word(EEPROMAddress, Value);
 }
+
