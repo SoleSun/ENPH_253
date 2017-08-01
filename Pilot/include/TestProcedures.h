@@ -14,4 +14,5 @@ class TestProcedures {
     void testMinMotor();
     void testManeuver (int leftTargetDistance, int rightTargetDistance, int maneuverLeftConstant, int maneuverRightConstant, int minMotorSpeed);
     void testAccelerate(int thresholdVal, int proportionalVal, int derivativeVal, int speedVal);
+    void clawTesting();
 };
