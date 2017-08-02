@@ -4,7 +4,7 @@
 #define ALIGN_DIST 18
 #define LEFT_CONST 40
 #define RIGHT_CONST 1
-// #define DEBUG 7
+#define DEBUG 7
 
 
 //PID parameters:
@@ -111,6 +111,7 @@ void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
                 reverse();
                 g_CurrentState = S_TapeFollow;
                 //reseting error values. 
+                // could have some problems over here. 
                 lastError = 0;
                 recentError = 0;
                 break;
@@ -131,13 +132,27 @@ void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
 // check cross 
 
 const bool detectCross(){
+    //reading in inputs from QRDs
     bool 
      L = analogRead(leftQRDSensor) > threshold,
         CL = analogRead(centreLeftQRDSensor) > threshold,
         CR = analogRead(centreRightQRDSensor) > threshold,
         R = analogRead(rightQRDSensor) > threshold; 
-      
-      if((L&&R)&&(CL&&CR)){
+
+
+  #ifdef DEBUG
+         LCD.clear();
+         LCD.home();
+         LCD.print(" CR  "); LCD.print(analogRead(centreRightQRDSensor)); 
+         LCD.print(" CL "); LCD.print(analogRead(centreRightQRDSensor)); 
+         LCD.setCursor(0,1);
+         LCD.print("L "); LCD.print(analogRead(leftQRDSensor)); 
+         LCD.print(" R "); LCD.print(analogRead(rightQRDSensor)); 
+         delay(100);
+   #endif
+       
+     //checking if a cross is detected, ie: when center 2 sees tape as well as one of the outer ones.
+      if((L&&R)&&(CL||CR)){      
         return true;
       }else{
         return false; 
@@ -233,59 +248,152 @@ void  tapeFollow(){
  
  
  // maneuvering the robot. 
- 
-void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, int rightConstant, int minimumMotorSpeed, bool reverse){
+void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, int rightConstant, int startMotorSpeed, bool reverse){
+    // setting up 
     Serial.begin(9600);
-    int leftDifference = leftTargetDistance;
-    int rightDifference = rightTargetDistance; 
-    Encoder encoders;
+    Encoder encoders = Encoder();
     long startTime = millis();
-    
-    while(leftDifference > 0 || rightDifference >0){
-        leftDifference = leftTargetDistance- encoders.getDistanceLeftWheel();
-        rightDifference = rightTargetDistance - encoders.getDistanceRightWheel();
+    int leftD;
+    int rightD;
+    int leftSpeed = startMotorSpeed; 
+    int rightSpeed = startMotorSpeed; 
 
-        // calculating the calibrated speeds. 
-        int leftSpeed; 
-        int rightSpeed; 
-        if( reverse){
-            leftSpeed = (minimumMotorSpeed + leftDifference * leftConstant);
-            rightSpeed = - (minimumMotorSpeed + rightDifference * rightConstant); 
-            
-            if (backOnTape()){
-                return; 
+    // going through the loop and while the distance travelled by either of the wheels have reached the target distance. 
+    // tune the speed according to eachother. 
+    // i am gonna make the left wheel the reference, ie: tune the right wheel, because the left wheel seems to travel a bit slower.
+     
+    while(leftTargetDistance > encoders.getDistanceLeftWheel() && rightTargetDistance > encoders.getDistanceRightWheel()){
+
+        //reading distance travelled by wheels
+        leftD = encoders.getDistanceLeftWheel();
+        rightD = encoders.getDistanceRightWheel();
+
+        long startTime = millis();
+
+        // if left travels further than right, then slow the leftWheel
+        if(leftD > rightD){
+            leftSpeed -= leftConstant * (leftD-rightD);
+            if(leftSpeed < 0){
+                leftSpeed = 0; 
             }
+        }
+        // if right distance is greater than left, then slow right down
+        else if (leftD < rightD){
+            rightSpeed -= - rightConstant * (rightD-leftD);
+            if(rightSpeed < 0){
+                rightSpeed = 0; 
+            }
+        }
+
+        //writing the speeds. 
+        if(!reverse){
+            motor.speed(leftMotor, leftSpeed);
+            motor.speed(rightMotor,-rightSpeed);
         }else{
-         leftSpeed = -(minimumMotorSpeed + leftDifference * leftConstant);
-         rightSpeed = minimumMotorSpeed + rightDifference * rightConstant;
+           motor.speed(leftMotor, -leftSpeed);
+           motor.speed(rightMotor,rightSpeed); 
         }
+        
 
-        // if the difference is zero, set the speed to zero. 
-        if(leftDifference <= 0){
-            leftSpeed = 0;
-        }else if(rightDifference <= 0){
-            rightSpeed = 0; 
-        }
-
-    cumulativeTime += millis()- startTime;
+// debugging code;
         #ifdef DEBUG
-
+          cumulativeTime += millis()- startTime;
           if(cumulativeTime >= 1000){
             LCD.clear();
-            LCD.print("L: "), LCD.print(leftDifference),LCD.print(" "), LCD.print(encoders.getDistanceLeftWheel());
+            LCD.print("L: "), LCD.print(leftD),LCD.print(" "), LCD.print(leftSpeed);
             LCD.setCursor(0,1);
-            LCD.print("R:"), LCD.print(" "), LCD.print(rightDifference), LCD.print(" "), LCD.print(encoders.getDistanceRightWheel());
+            LCD.print("R:"), LCD.print(" "), LCD.print(rightD), LCD.print(" "), LCD.print(rightSpeed);
             cumulativeTime = 0; 
           }
               
        #endif
-
-    //changing the speeds of the motors. 
-    
-        motor.speed(leftMotor, leftSpeed);
-        motor.speed(rightMotor, rightSpeed);
     }
+
+    // stopping all the motors
+     motor.speed(leftMotor,0);
+     motor.speed(rightMotor,0); 
+
+#ifdef DEBUG
+     while(true){
+        if (stopbutton()){
+            delay(100);
+            if(stopbutton()){
+                return;
+            }
+        }
+     }
+#endif 
+
 }
+
+//void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, int rightConstant, int minimumMotorSpeed, bool reverse){
+//    Serial.begin(9600);
+//    int leftDifference = leftTargetDistance;
+//    int rightDifference = rightTargetDistance; 
+//    Encoder encoders = Encoder();
+//    long startTime = millis();
+//    
+//    while(leftDifference > 0 && rightDifference >0){
+//        leftDifference = leftTargetDistance- encoders.getDistanceLeftWheel();
+//        rightDifference = rightTargetDistance - encoders.getDistanceRightWheel();
+//
+//    if(stopbutton()){
+//        return; 
+//    }
+//        // calculating the calibrated speeds. 
+//        int leftSpeed; 
+//        int rightSpeed; 
+//        if( reverse){
+//            leftSpeed = (minimumMotorSpeed + leftDifference * leftConstant);
+//            rightSpeed = - (minimumMotorSpeed + rightDifference * rightConstant); 
+//            
+//            if (backOnTape()){
+//                return; 
+//            }
+//        }else{
+//         leftSpeed = -(minimumMotorSpeed + leftDifference * leftConstant);
+//         rightSpeed = minimumMotorSpeed + rightDifference * rightConstant;
+//        }
+//
+//        // if the difference is zero, set the speed to zero. 
+//        if(leftDifference <= 0){
+//            leftSpeed = 0;
+//        }
+//        if(rightDifference <= 0){
+//            rightSpeed = 0; 
+//        }
+//
+//    cumulativeTime += millis()- startTime;
+//        #ifdef DEBUG
+//
+//          if(cumulativeTime >= 1000){
+//            LCD.clear();
+//            LCD.print("L: "), LCD.print(leftDifference),LCD.print(" "), LCD.print(encoders.getDistanceLeftWheel()),LCD.print(" "), LCD.print(rightSpeed);
+//            LCD.setCursor(0,1);
+//            LCD.print("R:"), LCD.print(" "), LCD.print(rightDifference), LCD.print(" "), LCD.print(encoders.getDistanceRightWheel()), LCD.print(" "), LCD.print(leftSpeed);
+//            cumulativeTime = 0; 
+//          }
+//              
+//       #endif
+//
+//    //changing the speeds of the motors. 
+//    
+//        motor.speed(leftMotor, leftSpeed);
+//        motor.speed(rightMotor, rightSpeed);
+//    }
+//
+//    motor.speed(leftMotor, 0);
+//    motor.speed(rightMotor, 0);
+//
+//    while(true){
+//        if (stopbutton()){
+//            delay(100);
+//            if(stopbutton()){
+//                return;
+//            }
+//        }
+//    }
+//}
  
  
 

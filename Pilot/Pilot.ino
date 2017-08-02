@@ -12,6 +12,7 @@
 #include "include/Encoder.h"
 #include "include/Gate_Navigator.h"
 #include "include/TestProcedures.h"
+#include "include/RetrivalFSM.h"
 
 /*
  * A cross is black tape that crosses the path, indicating either the entrance
@@ -34,7 +35,7 @@ MenuItem * LeftTargetDistanceValue;
 MenuItem * RightTargetDistanceValue;
 MenuItem * ManeuverLeftConstant;
 MenuItem * ManeuverRightConstant;
-MenuItem * MinMotorSpeed;
+MenuItem * StartMotorSpeed;         //////////
 MenuItem * menuItems[numberOfPIDMenuOptions];
 Gate_Navigator * gateSequence;
 
@@ -46,10 +47,11 @@ Gate_Navigator * gateSequence;
  *  switching between the different states
  */
 void Pilot() {
-  gateSequence = 
-  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value);
-  gateSequence->Drive();
-  
+//  gateSequence = 
+//  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value);
+//  gateSequence->Drive();
+
+    executeRetrivalFSM(ProportionalGain->Value, DerivativeGain->Value, Threshold->Value, Speed->Value);
 }
 
 void testMenu() {
@@ -133,7 +135,8 @@ void testMenu() {
            t.testMinMotor();
            break;
           case 7:
-            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,MinMotorSpeed->Value);
+            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,StartMotorSpeed->Value);
+            //////////////
             break;
           case 8:
             t.clawTesting();
@@ -261,11 +264,11 @@ void setup()
   DistanceToGate           = new MenuItem("GateDist");
   DistanceAfterGate        = new MenuItem("PostGateDist");
   ThresholdGate            = new MenuItem("ThreshGate");
-  LeftTargetDistanceValue  = new MenuItem("LeftTargetDistance");
-  RightTargetDistanceValue = new MenuItem("RightTargetDistance");
-  ManeuverLeftConstant     = new MenuItem("LeftManeuverP");
-  ManeuverRightConstant    = new MenuItem("RightManeuverP");
-  MinMotorSpeed            = new MenuItem("MinMotorSpeed");
+  LeftTargetDistanceValue  = new MenuItem("LTD");
+  RightTargetDistanceValue = new MenuItem("RTD");
+  ManeuverLeftConstant     = new MenuItem("LMP");
+  ManeuverRightConstant    = new MenuItem("RMP");
+  StartMotorSpeed            = new MenuItem("SMSpeed"); ////////////
   
   menuItems[0]      = Speed; 
   menuItems[1]      = ProportionalGain; 
@@ -279,7 +282,7 @@ void setup()
   menuItems[9]      = RightTargetDistanceValue;
   menuItems[10]     = ManeuverLeftConstant;
   menuItems[11]     = ManeuverRightConstant;
-  menuItems[12]     = MinMotorSpeed;
+  menuItems[12]     = StartMotorSpeed; //////// 
 }
  
 void loop()
