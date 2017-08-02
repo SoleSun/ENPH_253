@@ -378,7 +378,7 @@ void TestProcedures:: clawTesting(){
             LCD.home();
             armDownDegree = map(knob(6), 0, 1024, 0, 170);
             LCD.print(armDownDegree);
-y            delay(100);
+            delay(100);
             LCD.clear(); 
         }
    
