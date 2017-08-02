@@ -235,9 +235,8 @@ void  tapeFollow(){
  // maneuvering the robot. 
  
 void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, int rightConstant, int minimumMotorSpeed, bool reverse){
-    int leftDifference = leftTargetDistance;
-    int rightDifference = rightTargetDistance; 
-    Encoder encoders;
+    int leftDifference, rightDifference;
+    Encoder encoders = Encoder();
     long startTime = millis();
     
     while(leftDifference > 0 || rightDifference >0){
@@ -261,7 +260,8 @@ void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, 
         // if the difference is zero, set the speed to zero. 
         if(leftDifference <= 0){
             leftSpeed = 0;
-        }else if(rightDifference <= 0){
+        }
+        if(rightDifference <= 0){
             rightSpeed = 0; 
         }
 

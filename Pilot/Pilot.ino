@@ -100,11 +100,9 @@ void testMenu() {
         LCD.setCursor(0,1); LCD.print("MinMotor >Maneuver");
         break;
       case 8:
-        LCD.print("Claw");
+        LCD.print(">Claw");
         break; 
-        
-
-    }
+     }
     delay(100);
 
     if (startbutton()) {

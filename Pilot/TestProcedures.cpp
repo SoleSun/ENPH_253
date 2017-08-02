@@ -50,7 +50,7 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
 	while (true) {
 		bool 
 		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
-		CR = analogRead(centreRightQRDSensor) > thresholdVal;
+		CR = analogRead(centreRightQRDSensor) > thresholdVal,
 
 		int error;
 		if ( CL && CR )          error = 0;
@@ -213,38 +213,55 @@ void TestProcedures::testMotors () {
   }
 }
 
+/* Test procedure for the 270 and 150 Servos we have */
 void TestProcedures::testLift() {
   int flag = 0;
-  while (true){
 
+  while (true) {
+    LCD.clear(); LCD.home();
+    LCD.print("Ensure Servos"),
+    LCD.setCursor(0,1), LCD.print("at Rest");
+    delay(750);
+    LCD.clear(); LCD.home(); 
+    LCD.print("Press Start");
+    LCD.setCursor(0,1);
+    LCD.print("To Begin");
+    delay(750);
+    if(startbutton()) {
+      delay(100);
+      if (startbutton()){
+        break;
+      }
+    }
+  }
+  
+  while (true){
     LCD.clear(); LCD.home(); 
     
     if(startbutton()) {
       delay(100);
       if (startbutton()){ 
         if (!flag) {  
-          RCServo0.write(90);
+          RCServo0.write(150);
           RCServo1.write(0);
           flag++;
         } else {
           RCServo0.write(0);
-          RCServo1.write(180);
+          RCServo1.write(150);
           flag--;
         }
       }
     }
 
     if (!flag) {  
-          LCD.print("Left: 90");
-          LCD.setCursor(0,1);
-          LCD.print("Right: 0");
-        } else {
-          LCD.print("Left: 0");
-          LCD.setCursor(0,1);
-          LCD.print("Right: 180");
-        }
-
-    delay(100);
+      LCD.print("Left: 150");
+      LCD.setCursor(0,1);
+      LCD.print("Right: 0");
+    } else {
+      LCD.print("Left: 0");
+      LCD.setCursor(0,1);
+      LCD.print("Right: 150");
+    }
     
     if (stopbutton())
     {
@@ -255,7 +272,7 @@ void TestProcedures::testLift() {
           LCD.clear(); LCD.home();
           LCD.print("Exiting");
           LCD.setCursor(0,1); LCD.print("Lift Test");
-          delay(500);
+          delay(250);
           return;
         }
     }
