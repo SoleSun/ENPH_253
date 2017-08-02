@@ -235,7 +235,6 @@ void  tapeFollow(){
  // maneuvering the robot. 
  
 void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, int rightConstant, int minimumMotorSpeed, bool reverse){
-    Serial.begin(9600);
     int leftDifference = leftTargetDistance;
     int rightDifference = rightTargetDistance; 
     Encoder encoders;
@@ -246,9 +245,8 @@ void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, 
         rightDifference = rightTargetDistance - encoders.getDistanceRightWheel();
 
         // calculating the calibrated speeds. 
-        int leftSpeed; 
-        int rightSpeed; 
-        if( reverse){
+        int leftSpeed, rightSpeed;
+        if(reverse){
             leftSpeed = (minimumMotorSpeed + leftDifference * leftConstant);
             rightSpeed = - (minimumMotorSpeed + rightDifference * rightConstant); 
             

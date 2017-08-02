@@ -49,49 +49,37 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
   
 	while (true) {
 		bool 
-		L = analogRead(leftQRDSensor) > thresholdVal,
 		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
-		CR = analogRead(centreRightQRDSensor) > thresholdVal,
-		R = analogRead(rightQRDSensor) > thresholdVal; 
+		CR = analogRead(centreRightQRDSensor) > thresholdVal;
 
-    if (L && CL && CR && R) {
-      motor.speed(leftMotor, -speedVal + con);
-      motor.speed(rightMotor, speedVal + con);  
-    }
-    else {  
-  		int error;
-  		if ( CL && CR )       error = 0;
-  		else if ( CL && !CR )    error = -1;
-  		else if ( !CL && CR )    error = 1;
-  		else{
-  		   if( lastError > 0 )    error = 2;
-  		   else                 error = -2;
-  		}
-  
-  		if(!(error == lastError)){
-  		  recentError = lastError;
-  		  q=m;
-  		  m=1;
-  		}
-  
-  		int proportional = proportionalVal * error,
-  			derivative   = (int) (derivativeVal * (float)(error - recentError) / (q + m) );
-  		con = proportional + derivative;
-  
-  		m++;
-  		motor.speed(leftMotor, -speedVal + con);
-  		motor.speed(rightMotor, speedVal + con);
-  
-  		lastError = error;
-  
-  		LCD.clear(); LCD.home();
-  		LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
-  		LCD.print(" "); LCD.print(derivativeVal);
-  		LCD.setCursor(0,1);
-  		LCD.print("L "); LCD.print(analogRead(centreLeftQRDSensor)); LCD.print(" R "); LCD.print(analogRead(centreRightQRDSensor));
-  		delay(25);
-  	}
+		int error;
+		if ( CL && CR )          error = 0;
+		else if ( CL && !CR )    error = -1;
+		else if ( !CL && CR )    error = 1;
+		else              		   error = ( lastError > 0 ) ? 2 : -2;
 
+		if(!(error == lastError)){
+		  recentError = lastError;
+		  q=m;
+		  m=1;
+		}
+
+		int proportional = proportionalVal * error,
+			derivative   = (int) (derivativeVal * (float)(error - recentError) / (q + m) );
+		con = proportional + derivative;
+
+		m++;
+		motor.speed(leftMotor, -speedVal + con);
+		motor.speed(rightMotor, speedVal + con);
+
+		lastError = error;
+
+		LCD.clear(); LCD.home();
+		LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
+		LCD.print(" "); LCD.print(derivativeVal);
+		LCD.setCursor(0,1);
+		LCD.print("L "); LCD.print(analogRead(centreLeftQRDSensor)); LCD.print(" R "); LCD.print(analogRead(centreRightQRDSensor));
+	
     if (stopbutton())
     {
       delay(100);
@@ -368,9 +356,8 @@ void TestProcedures:: clawTesting(){
 // #define CLAWCLOSEPOSITION 50       
 // #define CLAWDELAY 2
 
- 
     int armDownPosition = 0; 
-    Claw newClaw(CLAWOPENPOSITION, CLAWCLOSEPOSITION,ARMUPPOSITION ,CLAWDELAY,ARMDELAY,CLAWPIN,ARMPIN);
+    Claw newClaw(CLAWOPENPOSITION, CLAWCLOSEPOSITION, ARMUPPOSITION ,CLAWDELAY, ARMDELAY, CLAWPIN, ARMPIN);
     while(true){
             int armDownDegree = 0; 
 
@@ -378,7 +365,7 @@ void TestProcedures:: clawTesting(){
             LCD.home();
             armDownDegree = map(knob(6), 0, 1024, 0, 170);
             LCD.print(armDownDegree);
-y            delay(100);
+            delay(100);
             LCD.clear(); 
         }
    
