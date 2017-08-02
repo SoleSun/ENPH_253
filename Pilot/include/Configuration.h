@@ -31,12 +31,12 @@
 
 //Retrival Agent Arm		
  #define ARMPIN 9		
- #define ARMUPPOSITION 150		
+ #define ARMUPPOSITION 180	
  #define ARMDELAY 5		
- #define HANDOFFPOSITION 150		
+ #define HANDOFFPOSITION 30		
  		
  // Retrival Agent Claw		
  #define	CLAWPIN 8		
  #define CLAWOPENPOSITION 0	
- #define CLAWCLOSEPOSITION 120		
+ #define CLAWCLOSEPOSITION 100		
  #define CLAWDELAY 2
