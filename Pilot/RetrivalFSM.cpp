@@ -1,11 +1,17 @@
 # include "include/RetrivalFSM.h"
 
-#define MOTOR_SPEED_MIN 139
-#define ALIGN_DIST 18
-#define LEFT_CONST 40
-#define RIGHT_CONST 1
-#define DEBUG 7
+/////////// TEMP
+#define CROSS_DETECT_NEW 
 
+// alignment Parameters
+#define START_SPEED 90
+#define ALIGN_DIST_FRONT 15
+#define LEFT_FRONT_CONST 6
+#define RIGHT_FRONT_CONST 1
+#define LEFT_BACK_CONST 1
+#define define RIGHT_BACK_CONST 1
+#define FORWARD_LEFT_LEFT_WHEEL_SPEED 80
+#define FORWARD_LEFT_RIGHT_WHEEL_SPEED 100
 
 //PID parameters:
 int proportional; 
@@ -15,108 +21,122 @@ int motorSpeed;
 int lastError, recentError;
 int q = 0, m = 0, con = 0; 
 
-
 // agents servoPositions:
-int armDownPositions[6] = {144, 140,146,144,140,146};
+int armDownPositions[6] = {30, 30,30,30,30,30};
 
-
+// StateMachine State:
 States g_CurrentState = S_TapeFollow; 
+
+// Testing pursposes
+#define LCDDELAY 500
+//#define DEBUG 7
 long cumulativeTime = 0; 
+int startTime = 0; 
 
 
 void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
+
+    // initial set up. 
     bool fsmDone = false;
     Claw newClaw(CLAWOPENPOSITION, CLAWCLOSEPOSITION, ARMUPPOSITION,CLAWDELAY, ARMDELAY, CLAWPIN, ARMPIN); 
     int counter = 0;
-  lastError = 0;
-  recentError = 0; 
+
+    // tape following requirements. 
+    lastError = 0;
+    recentError = 0; 
     
     // PID: 
-    
     proportional = p;
     derivative = d;
     threshold = QRDthreshold;
     motorSpeed = MotorSpeed; 
+
+
+    startTime = millis();
     
-
-  //test code: 
-
-  LCD.clear();
-        LCD.print(g_CurrentState);
-        delay(1000);
-        
     while(!fsmDone){
         switch(g_CurrentState){ 
-            case S_TapeFollow:
+            case S_TapeFollow:    
+            // this state just is suppose to follow tape and then stop. 
                 tapeFollow();
                 if(detectCross()) {
                     // stopping the motor:
                     motor.speed(leftMotor, 0);
                     motor.speed(rightMotor, 0);
-                    
+
+                    //printing for clarification. 
                     LCD.clear();
                     LCD.home();
                     LCD.print("Cross Detected");
-                    delay(2000);
-                    
-                    //g_CurrentState = S_Forward; 
-                    
+                    delay(LCDDELAY );
+
+                    //switch the next state to the the retrieve state. 
+                    g_CurrentState = S_Forward; 
                 }
                 break;
                 
             
             case S_Forward:
-
+                // go slightly forward to align the claw with the animal 
                  LCD.clear();
                  LCD.home();
                  LCD.print("Forward");
-                 delay(2000);
+                 delay(LCDDELAY );
+                 LCD.clear();
+
+                 // calling go forward function.
                 forward();
-                g_CurrentState = S_Retrieve;
                  // stopping the motor:
                 motor.speed(leftMotor, 0);
                 motor.speed(rightMotor, 0);
-                    
+
+                // setting the speeds for the motors as well as switching the states. 
+                g_CurrentState = S_Retrieve;
                 break;
                     
             
             case S_Retrieve:
                 LCD.clear();
-                    LCD.home();
-                    LCD.print("Retrieve");
-                    delay(2000);
-                    
+                LCD.home();
+                LCD.print("Retrieve");    
+                delay(LCDDELAY);
+
+                 // if not grabbed 6 agents yets, retrieve more. 
                 if (counter >= 0 && counter <6){
-                    newClaw.retrieve(armDownPositions [counter]);
+                    newClaw.retrieve(armDownPositions[counter]);
                     counter++; 
+                    // once grabbed an agent, try to go front and turn left so that 
+                    // the cart will go back to tape follow.
+                    g_CurrentState = S_ForwardLeft; 
                 } 
-                
-                if(counter >=6){
-                    g_CurrentState = S_Exit; 
-                }else{
-                    g_CurrentState = S_Reverse; 
+                else if(counter >=6){
+                    // if 6 agents have been grabbed, switch states correspodningly.
+                    g_CurrentState = S_Exit;
                 }
-                // stopping the motor:
-                    motor.speed(leftMotor, 0);
-                    motor.speed(rightMotor, 0);
                 break; 
             
             
-            case S_Reverse:
+            case S_ForwardLeft:
                 LCD.clear();
                 LCD.home();
-                LCD.print("reverse");
-                delay(2000);
-                    
-                reverse();
+                LCD.print("forwardLeft");
+                delay(LCDDELAY);
+
+                 // make the cart go forward and left until tape is detected.
+                while(!backOnTape()){
+                    forwardAndLeft();
+                }
+                 // back to tape following. 
                 g_CurrentState = S_TapeFollow;
-                //reseting error values. 
-                // could have some problems over here. 
-                lastError = 0;
-                recentError = 0;
                 break;
-                
+
+
             case S_Exit: 
+                LCD.clear();
+                LCD.home();
+                LCD.print("done");
+                delay(LCDDELAY);
+                
                 fsmDone = true; 
                 break; 
             
@@ -141,23 +161,45 @@ const bool detectCross(){
 
 
   #ifdef DEBUG
+        cumulativeTime += millis()- startTime;
+        if(cumulativeTime > 1000){
          LCD.clear();
          LCD.home();
          LCD.print(" CR  "); LCD.print(analogRead(centreRightQRDSensor)); 
-         LCD.print(" CL "); LCD.print(analogRead(centreRightQRDSensor)); 
+         LCD.print(" CL "); LCD.print(analogRead(centreLefttQRDSensor)); 
          LCD.setCursor(0,1);
          LCD.print("L "); LCD.print(analogRead(leftQRDSensor)); 
          LCD.print(" R "); LCD.print(analogRead(rightQRDSensor)); 
-         delay(100);
+        }
+         
    #endif
        
      //checking if a cross is detected, ie: when center 2 sees tape as well as one of the outer ones.
-      if((L&&R)&&(CL||CR)){      
+     #ifndef CROSS_DETECT_NEW
+      if((L||R)&&(CL&&CR)){      
         return true;
       }else{
         return false; 
       }
-    
+
+
+      
+     #else
+     if (CL && CR) {
+        // on track
+        if (L && R) {
+            return true;
+        }
+        else if (L) {
+            motor.speed(leftMotor,0);
+        }
+        else if (R) {
+            // turn right motor off (or slow)  
+             motor.speed(rightMotor,0);  
+        }
+    }
+    return false;
+    #endif
 }
 
 // back to tape
@@ -178,16 +220,12 @@ const bool backOnTape(){
 
 //tape following
 void  tapeFollow(){
-       
-    
     // boolean values for PID tuning
     bool 
         L = analogRead(leftQRDSensor) > threshold,
         CL = analogRead(centreLeftQRDSensor) > threshold,
         CR = analogRead(centreRightQRDSensor) > threshold,
         R = analogRead(rightQRDSensor) > threshold; 
-
-
     // Copied from Joel
     int error;
           if ( CL && CR )       error = 0;
@@ -197,7 +235,6 @@ void  tapeFollow(){
            if( lastError > 0 )    error = 2;
            else                 error = -2;
         }
-      
         if(!(error == lastError)){
           recentError = lastError;
           q=m;
@@ -214,22 +251,17 @@ void  tapeFollow(){
       
         lastError = error;
 
-    #ifdef DEBUG 
 
-        
-       LCD.clear();
+        // testing code:
         LCD.home();
-        LCD.print(L);
-        LCD.print(" ");
-        LCD.print(CL);
-        LCD.print(" ");
-        LCD.print(CR);
-        LCD.print("");
-        LCD.print(R);
-        
-        delay(10);
-        
-    #endif
+        LCD.clear();
+        LCD.print(" CR  "); LCD.print(analogRead(centreRightQRDSensor)); 
+         LCD.print(" CL "); LCD.print(analogRead(centreRightQRDSensor)); 
+         LCD.setCursor(0,1);
+         LCD.print("L "); LCD.print(analogRead(leftQRDSensor)); 
+         LCD.print(" R "); LCD.print(analogRead(rightQRDSensor)); 
+       delay(100);
+
 }
  
  
@@ -239,13 +271,23 @@ void  tapeFollow(){
  
  void forward(){
  
-    maneuver(ALIGN_DIST, ALIGN_DIST,RIGHT_CONST,LEFT_CONST, MOTOR_SPEED_MIN, false);
+    maneuver(ALIGN_DIST_FRONT, ALIGN_DIST_FRONT,RIGHT_FRONT_CONST,LEFT_FRONT_CONST, START_SPEED, false);
  }
- 
- void reverse(){
-    maneuver(ALIGN_DIST, ALIGN_DIST,RIGHT_CONST,LEFT_CONST, MOTOR_SPEED_MIN, true);
+
+
+ void forwardAndLeft(){
+        
+       //make the motors travel forward but veer off to the left. The numbers needs to be tuned. 
+       motor.speed(leftMotor, FORWARD_LEFT_LEFT_WHEEL_SPEED);
+       motor.speed(leftMotor, FORWARD_LEFT_RIGHT_WHEEL_SPEED);
+    
  }
+
  
+// void reverse(){
+//    maneuver(ALIGN_DIST_FRONT, ALIGN_DIST_FRONT,RIGHT_BACK_CONST,LEFT_BACK_CONST, START_SPEED, true);
+// }
+// 
  
  // maneuvering the robot. 
 void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, int rightConstant, int startMotorSpeed, bool reverse){
@@ -257,49 +299,47 @@ void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, 
     int rightD;
     int leftSpeed = startMotorSpeed; 
     int rightSpeed = startMotorSpeed; 
+    int error; 
 
     // going through the loop and while the distance travelled by either of the wheels have reached the target distance. 
     // tune the speed according to eachother. 
     // i am gonna make the left wheel the reference, ie: tune the right wheel, because the left wheel seems to travel a bit slower.
      
     while(leftTargetDistance > encoders.getDistanceLeftWheel() && rightTargetDistance > encoders.getDistanceRightWheel()){
-
+        
         //reading distance travelled by wheels
         leftD = encoders.getDistanceLeftWheel();
         rightD = encoders.getDistanceRightWheel();
-
-        long startTime = millis();
+         
+        startTime = millis();
 
         // if left travels further than right, then slow the leftWheel
         if(leftD > rightD){
-            leftSpeed -= leftConstant * (leftD-rightD);
-            if(leftSpeed < 0){
-                leftSpeed = 0; 
-            }
-        }
-        // if right distance is greater than left, then slow right down
-        else if (leftD < rightD){
-            rightSpeed -= - rightConstant * (rightD-leftD);
-            if(rightSpeed < 0){
-                rightSpeed = 0; 
-            }
+            error = 1;
+        } else if (leftD < rightD){
+            error = -1;
+        } else {
+            error = 0;
         }
 
         //writing the speeds. 
         if(!reverse){
+            leftSpeed = -startMotorSpeed + leftConstant * error; 
+            rightSpeed = startMotorSpeed + rightConstant * error;
             motor.speed(leftMotor, leftSpeed);
-            motor.speed(rightMotor,-rightSpeed);
+            motor.speed(rightMotor,rightSpeed);
         }else{
-           motor.speed(leftMotor, -leftSpeed);
-           motor.speed(rightMotor,rightSpeed); 
+           leftSpeed = (startMotorSpeed+20) - leftConstant * error; 
+           rightSpeed = -(startMotorSpeed + 20) - rightConstant * error;
+           motor.speed(leftMotor, leftSpeed);
+           motor.speed(rightMotor, rightSpeed); 
         }
-        
 
-// debugging code;
+ //debugging code;
         #ifdef DEBUG
           cumulativeTime += millis()- startTime;
-          if(cumulativeTime >= 1000){
-            LCD.clear();
+          if(cumulativeTime >= 50){
+            LCD.clear(); LCD.home();
             LCD.print("L: "), LCD.print(leftD),LCD.print(" "), LCD.print(leftSpeed);
             LCD.setCursor(0,1);
             LCD.print("R:"), LCD.print(" "), LCD.print(rightD), LCD.print(" "), LCD.print(rightSpeed);
@@ -307,23 +347,23 @@ void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, 
           }
               
        #endif
-    }
+   }
 
     // stopping all the motors
      motor.speed(leftMotor,0);
      motor.speed(rightMotor,0); 
-
-#ifdef DEBUG
-     while(true){
-        if (stopbutton()){
-            delay(100);
-            if(stopbutton()){
-                return;
+  
+    
+    #ifdef DEBUG
+         while(true){
+            if (stopbutton()){
+                delay(100);
+                if(stopbutton()){
+                    return;
+                }
             }
-        }
-     }
-#endif 
-
+         }
+    #endif    
 }
 
 //void maneuver(int leftTargetDistance, int rightTargetDistance,int leftConstant, int rightConstant, int minimumMotorSpeed, bool reverse){

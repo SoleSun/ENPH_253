@@ -35,14 +35,11 @@ void Zipline_Navigator::tapeFollow() {
 		}
       
   		int error;
-  		if ( CL && CR )       error = 0;
+  		if ( CL && CR )          error = 0;
   		else if ( CL && !CR )    error = -1;
   		else if ( !CL && CR )    error = 1;
-  		else{
-  		   if( lastError > 0 )    error = 2;
-  		   else                 error = -2;
-  		}
-  	  
+  		else               		   error = (lastError > 0) ? 2 : -2;
+  		
   		if(!(error == lastError)){
   		  recentError = lastError;
   		  q=m;

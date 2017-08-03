@@ -48,50 +48,40 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
 	delay(1000);
   
 	while (true) {
-		bool 
-		L = analogRead(leftQRDSensor) > thresholdVal,
-		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
-		CR = analogRead(centreRightQRDSensor) > thresholdVal,
-		R = analogRead(rightQRDSensor) > thresholdVal; 
+		bool CL = analogRead(centreLeftQRDSensor) > thresholdVal,
+		CR = analogRead(centreRightQRDSensor) > thresholdVal;
 
-    if (L && CL && CR && R) {
-      motor.speed(leftMotor, -speedVal + con);
-      motor.speed(rightMotor, speedVal + con);  
-    }
-    else {  
-  		int error;
-  		if ( CL && CR )       error = 0;
-  		else if ( CL && !CR )    error = -1;
-  		else if ( !CL && CR )    error = 1;
-  		else{
-  		   if( lastError > 0 )    error = 2;
-  		   else                 error = -2;
-  		}
-  
-  		if(!(error == lastError)){
-  		  recentError = lastError;
-  		  q=m;
-  		  m=1;
-  		}
-  
-  		int proportional = proportionalVal * error,
-  			derivative   = (int) (derivativeVal * (float)(error - recentError) / (q + m) );
-  		con = proportional + derivative;
-  
-  		m++;
-  		motor.speed(leftMotor, -speedVal + con);
-  		motor.speed(rightMotor, speedVal + con);
-  
-  		lastError = error;
-  
-  		LCD.clear(); LCD.home();
-  		LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
-  		LCD.print(" "); LCD.print(derivativeVal);
-  		LCD.setCursor(0,1);
-  		LCD.print("L "); LCD.print(analogRead(centreLeftQRDSensor)); LCD.print(" R "); LCD.print(analogRead(centreRightQRDSensor));
-  		delay(25);
-  	}
+		int error;
+		if ( CL && CR )          error = 0;
+		else if ( CL && !CR )    error = -1;
+		else if ( !CL && CR )    error = 1;
+		else              		   error = ( lastError > 0 ) ? 2 : -2;
 
+		if(!(error == lastError)){
+		  recentError = lastError;
+		  q=m;
+		  m=1;
+		}
+
+		int proportional = proportionalVal * error,
+			derivative   = (int) (derivativeVal * (float)(error - recentError) / (q + m) );
+		con = proportional + derivative;
+
+		m++;
+		motor.speed(leftMotor, -speedVal + con);
+		motor.speed(rightMotor, speedVal + con);
+
+		lastError = error;
+
+        LCD.clear();
+        LCD.home();
+         LCD.print("LS: "), LCD.print(-speedVal+con), LCD.print("RS:"), LCD.print(speedVal+con);  
+		//LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
+		//LCD.print(" "); LCD.print(derivativeVal);
+		
+		LCD.setCursor(0,1);
+	    LCD.print("L "); LCD.print(analogRead(centreLeftQRDSensor)); LCD.print(" R "); LCD.print(analogRead(centreRightQRDSensor));
+	
     if (stopbutton())
     {
       delay(100);
@@ -198,16 +188,21 @@ void TestProcedures::testAccelerate(int thresholdVal, int proportionalVal, int d
 }
 
 void TestProcedures::testMotors () {
+  
+  LCD.clear(); LCD.home();
+  LCD.print("Testing");
+  LCD.setCursor(0,1); LCD.print("Motors");
+  delay(500);  
+  
   while (true) {
-
-    LCD.clear(); LCD.home();
-    LCD.print("Testing");
-    LCD.setCursor(0,1); LCD.print("Motors");
     
-    int motorSpeed = map (knob(6), 0, 1023, 0, 255);
+    int motorSpeed = map (knob(6), 0, 1023, -255, 255);
     
     motor.speed(leftMotor, -motorSpeed);
     motor.speed(rightMotor, motorSpeed);
+  
+    LCD.clear(); LCD.home();
+    LCD.print(motorSpeed);
     
     if (stopbutton())
     {
@@ -225,38 +220,55 @@ void TestProcedures::testMotors () {
   }
 }
 
+/* Test procedure for the 270 and 150 Servos we have */
 void TestProcedures::testLift() {
   int flag = 0;
-  while (true){
 
+  while (true) {
+    LCD.clear(); LCD.home();
+    LCD.print("Ensure Servos"),
+    LCD.setCursor(0,1), LCD.print("at Rest");
+    delay(750);
+    LCD.clear(); LCD.home(); 
+    LCD.print("Press Start");
+    LCD.setCursor(0,1);
+    LCD.print("To Begin");
+    delay(750);
+    if(startbutton()) {
+      delay(100);
+      if (startbutton()){
+        break;
+      }
+    }
+  }
+  
+  while (true){
     LCD.clear(); LCD.home(); 
     
     if(startbutton()) {
       delay(100);
       if (startbutton()){ 
         if (!flag) {  
-          RCServo0.write(90);
+          RCServo0.write(150);
           RCServo1.write(0);
           flag++;
         } else {
           RCServo0.write(0);
-          RCServo1.write(180);
+          RCServo1.write(150);
           flag--;
         }
       }
     }
 
     if (!flag) {  
-          LCD.print("Left: 90");
-          LCD.setCursor(0,1);
-          LCD.print("Right: 0");
-        } else {
-          LCD.print("Left: 0");
-          LCD.setCursor(0,1);
-          LCD.print("Right: 180");
-        }
-
-    delay(100);
+      LCD.print("Left: 150");
+      LCD.setCursor(0,1);
+      LCD.print("Right: 0");
+    } else {
+      LCD.print("Left: 0");
+      LCD.setCursor(0,1);
+      LCD.print("Right: 150");
+    }
     
     if (stopbutton())
     {
@@ -267,7 +279,7 @@ void TestProcedures::testLift() {
           LCD.clear(); LCD.home();
           LCD.print("Exiting");
           LCD.setCursor(0,1); LCD.print("Lift Test");
-          delay(500);
+          delay(250);
           return;
         }
     }
@@ -338,8 +350,22 @@ void TestProcedures::testMinMotor() {
         }
     }
 }
-void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDistanceVal,int maneuverLeftConstantVal,int maneuverRightConstantVal,int startMotorSpeedVal){
-    maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,startMotorSpeedVal, false);
+void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDistanceVal,int maneuverLeftConstantVal,int maneuverRightConstantVal,int startMotorSpeedVal, bool reverse){
+
+
+    while(!stopbutton()){
+        LCD.clear();
+        LCD.home();
+         LCD.print(" CR  "); LCD.print(analogRead(centreRightQRDSensor)); 
+         LCD.print(" CL "); LCD.print(analogRead(centreLeft QRDSensor)); 
+         LCD.setCursor(0,1);
+         LCD.print("L "); LCD.print(analogRead(leftQRDSensor)); 
+         LCD.print(" R "); LCD.print(analogRead(rightQRDSensor)); 
+         delay(100);
+    }
+    return;
+   
+    //maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,startMotorSpeedVal, reverse);
 }
 
 // Teseting procedure for Claw:
@@ -357,9 +383,8 @@ void TestProcedures:: clawTesting(){
 // #define CLAWCLOSEPOSITION 50       
 // #define CLAWDELAY 2
 
- 
     int armDownPosition = 0; 
-    Claw newClaw(CLAWOPENPOSITION, CLAWCLOSEPOSITION,ARMUPPOSITION ,CLAWDELAY,ARMDELAY,CLAWPIN,ARMPIN);
+    Claw newClaw(CLAWOPENPOSITION, CLAWCLOSEPOSITION, ARMUPPOSITION ,CLAWDELAY, ARMDELAY, CLAWPIN, ARMPIN);
     while(true){
             int armDownDegree = 0; 
 

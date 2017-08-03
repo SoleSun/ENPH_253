@@ -31,7 +31,7 @@
 
 */
 
-enum States{S_TapeFollow, S_Forward, S_Retrieve, S_Reverse, S_Exit};
+enum States{S_TapeFollow, S_Forward, S_Retrieve, S_ForwardLeft, S_Exit};
 extern States g_CurrentState;
 
  
@@ -50,8 +50,9 @@ void forward();
 // State 3: Retrieve
 void retrieveAgent();
 
-//Steate 4: 
-void reverse();
+//State 4: 
+void forwardAndLeft();
+
 const bool backOnTape();
 
 //State 5:

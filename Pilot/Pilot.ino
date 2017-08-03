@@ -51,7 +51,7 @@ void Pilot() {
 //  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value);
 //  gateSequence->Drive();
 
-    executeRetrivalFSM(ProportionalGain->Value, DerivativeGain->Value, Threshold->Value, Speed->Value);
+    executeRetrivalFSM(20, 5, 200, 90);
 }
 
 void testMenu() {
@@ -60,7 +60,7 @@ void testMenu() {
   LCD.setCursor(0,1); LCD.print("Test Menu");
   delay(500);
 
-  const int noOfTestOptions = 9; 
+  const int noOfTestOptions = 10; 
   
   TestProcedures t = TestProcedures (); 
   
@@ -87,26 +87,29 @@ void testMenu() {
         break;
       case 4:
         LCD.print(">Encoder Acc");
-        LCD.setCursor(0,1); LCD.print("MinMotor Maneuver"); 
+        LCD.setCursor(0,1); LCD.print("MinMotor"); 
         break;
       case 5:
         LCD.print("Encoder >Acc");
-        LCD.setCursor(0,1); LCD.print("MinMotor Maneuver"); 
+        LCD.setCursor(0,1); LCD.print("MinMotor"); 
         break;
       case 6:
         LCD.print("Encoder Acc");
-        LCD.setCursor(0,1); LCD.print(">MinMotor Maneuver");
+        LCD.setCursor(0,1); LCD.print(">MinMotor");
         break;
       case 7: 
         LCD.print("Encoder Acc");
-        LCD.setCursor(0,1); LCD.print("MinMotor >Maneuver");
+        LCD.setCursor(0,1); LCD.print("MinMotor >Forward");
         break;
       case 8:
-        LCD.print("Claw");
+        LCD.print(">Reverse");
+        LCD.setCursor(0,1); LCD.print("Claw");
+        break;
+      case 9:
+        LCD.print("Reverse");
+        LCD.setCursor(0,1); LCD.print(">Claw");
         break; 
-        
-
-    }
+     }
     delay(100);
 
     if (startbutton()) {
@@ -135,11 +138,14 @@ void testMenu() {
            t.testMinMotor();
            break;
           case 7:
-            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,StartMotorSpeed->Value);
-            //////////////
+            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,StartMotorSpeed->Value, false);
             break;
           case 8:
+            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,StartMotorSpeed->Value, true);
+            break;
+          case 9:
             t.clawTesting();
+            break;
         }
       } // if - cross check start button
     }
