@@ -58,4 +58,4 @@ const bool backOnTape();
 void exit();
 
  void tapeFollow();
-void maneuver(double leftTargetDistance, double rightTargetDistance,double leftConstant, double rightConstant, double minimumMotorSpeed, bool reverse);
+void maneuver(double leftTargetDistance, double rightTargetDistance,double leftConstant, double rightConstant, double startingMotorSpeed, bool reverse);

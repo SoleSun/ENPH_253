@@ -48,6 +48,7 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
 	delay(1000);
   
 	while (true) {
+
 		bool 
 		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
 		CR = analogRead(centreRightQRDSensor) > thresholdVal;
@@ -74,11 +75,14 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
 
 		lastError = error;
 
-		LCD.clear(); LCD.home();
-		LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
-		LCD.print(" "); LCD.print(derivativeVal);
+        LCD.clear();
+        LCD.home();
+         LCD.print("LS: "), LCD.print(-speedVal+con), LCD.print("RS:"), LCD.print(speedVal+con);  
+		//LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
+		//LCD.print(" "); LCD.print(derivativeVal);
+		
 		LCD.setCursor(0,1);
-		LCD.print("L "); LCD.print(analogRead(centreLeftQRDSensor)); LCD.print(" R "); LCD.print(analogRead(centreRightQRDSensor));
+	    LCD.print("L "); LCD.print(analogRead(centreLeftQRDSensor)); LCD.print(" R "); LCD.print(analogRead(centreRightQRDSensor));
 	
     if (stopbutton())
     {
@@ -186,16 +190,21 @@ void TestProcedures::testAccelerate(int thresholdVal, int proportionalVal, int d
 }
 
 void TestProcedures::testMotors () {
+  
+  LCD.clear(); LCD.home();
+  LCD.print("Testing");
+  LCD.setCursor(0,1); LCD.print("Motors");
+  delay(500);  
+  
   while (true) {
-
-    LCD.clear(); LCD.home();
-    LCD.print("Testing");
-    LCD.setCursor(0,1); LCD.print("Motors");
     
-    int motorSpeed = map (knob(6), 0, 1023, 0, 255);
+    int motorSpeed = map (knob(6), 0, 1023, -255, 255);
     
     motor.speed(leftMotor, -motorSpeed);
     motor.speed(rightMotor, motorSpeed);
+  
+    LCD.clear(); LCD.home();
+    LCD.print(motorSpeed);
     
     if (stopbutton())
     {
@@ -343,23 +352,26 @@ void TestProcedures::testMinMotor() {
         }
     }
 }
-void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDistanceVal,int maneuverLeftConstantVal,int maneuverRightConstantVal,int minMotorSpeedVal){
-  while(true){
-    maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,minMotorSpeedVal, false);
-    if (stopbutton()){
-      delay(100);
-      if(stopbutton()){
-        LCD.clear(); LCD.home();
-        LCD.print("Exiting Maneuver Test");
-        delay(500);
-        return;
-      }
-    }
-  }
+void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDistanceVal,int maneuverLeftConstantVal,int maneuverRightConstantVal,int startMotorSpeedVal, bool reverse){
+
+
+//    while(!stopbutton()){
+//        LCD.clear();
+//        LCD.home();
+//         LCD.print(" CR  "); LCD.print(analogRead(centreRightQRDSensor)); 
+//         LCD.print(" CL "); LCD.print(analogRead(centreLeftQRDSensor)); 
+//         LCD.setCursor(0,1);
+//         LCD.print("L "); LCD.print(analogRead(leftQRDSensor)); 
+//         LCD.print(" R "); LCD.print(analogRead(rightQRDSensor)); 
+//         delay(100);
+//    }
+//    return;
+   
+    maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,startMotorSpeedVal, reverse);
 }
 
 // Teseting procedure for Claw:
-void TestProcedures:: clawTesting(){
+void TestProcedures::clawTesting(){
 
 ////Retrival Agent Arm        
 // #define ARMPIN 9       
@@ -405,5 +417,27 @@ void TestProcedures:: clawTesting(){
         }
         delay(1000);
         }
+}
+
+void TestProcedures::testQRDs() {
+    while(true){
+        LCD.clear(); LCD.home();
+        LCD.print("CL: "); LCD.print(analogRead(centreLeftQRDSensor));
+        LCD.print(" CR: "); LCD.print(analogRead(centreRightQRDSensor));
+        LCD.setCursor(0,1);
+        LCD.print("L: "); LCD.print(analogRead(leftQRDSensor));
+        LCD.print(" R: "); LCD.print(analogRead(rightQRDSensor));
+
+        delay(25);
+
+        if (stopbutton())
+        {
+          delay(100);
+          if (stopbutton())
+            { 
+              return;
+            }
+        }
+    }
 }
 

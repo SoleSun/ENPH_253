@@ -54,10 +54,9 @@ int Encoder::getDistanceRightWheel(){
 int Encoder::getDistanceLeftWheel(){
 	return (int) ((counts[leftEncoder] * wheelDiameter * pi) / (gearRatio * 48));
 }
-\
 
 int Encoder::convertDistToTicks (unsigned int distance) {
-  return (int) ((distance * gearRatio * 44) / (wheelDiameter * pi));
+  return (int) ((distance * gearRatio * 48) / (wheelDiameter * pi));
 }
 
 ISR(INT0_vect){

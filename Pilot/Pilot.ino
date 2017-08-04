@@ -12,6 +12,7 @@
 #include "include/Encoder.h"
 #include "include/Gate_Navigator.h"
 #include "include/TestProcedures.h"
+#include "include/RetrivalFSM.h"
 
 /*
  * A cross is black tape that crosses the path, indicating either the entrance
@@ -39,8 +40,9 @@ MenuItem * LeftTargetDistanceValue;
 MenuItem * RightTargetDistanceValue;
 MenuItem * ManeuverLeftConstant;
 MenuItem * ManeuverRightConstant;
-MenuItem * MinMotorSpeed;
 MenuItem * DistanceToZipline;
+MenuItem * StartMotorSpeed;        
+MenuItem * StartMotorSpeed;        
 MenuItem * menuItems[numberOfPIDMenuOptions];
 Gate_Navigator * gateSequence;
 
@@ -58,7 +60,8 @@ void Pilot(bool left) {
   gateSequence = 
   new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value, DistanceAfterGate->Value);
   gateSequence->Drive();
-  
+
+  executeRetrivalFSM(25, 12, 150, 90);
 }
 
 void testMenu() {
@@ -67,7 +70,7 @@ void testMenu() {
   LCD.setCursor(0,1); LCD.print("Test Menu");
   delay(500);
 
-  const int noOfTestOptions = 9; 
+  const int noOfTestOptions = 11; 
   
   TestProcedures t = TestProcedures (); 
   
@@ -94,22 +97,31 @@ void testMenu() {
         break;
       case 4:
         LCD.print(">Encoder Acc");
-        LCD.setCursor(0,1); LCD.print("MinMotor Maneuver"); 
+        LCD.setCursor(0,1); LCD.print("MinMotor"); 
         break;
       case 5:
         LCD.print("Encoder >Acc");
-        LCD.setCursor(0,1); LCD.print("MinMotor Maneuver"); 
+        LCD.setCursor(0,1); LCD.print("MinMotor"); 
         break;
       case 6:
         LCD.print("Encoder Acc");
-        LCD.setCursor(0,1); LCD.print(">MinMotor Maneuver");
+        LCD.setCursor(0,1); LCD.print(">MinMotor");
         break;
       case 7: 
         LCD.print("Encoder Acc");
-        LCD.setCursor(0,1); LCD.print("MinMotor >Maneuver");
+        LCD.setCursor(0,1); LCD.print("MinMotor >Forward");
         break;
       case 8:
-        LCD.print(">Claw");
+        LCD.print(">Reverse Claw");
+        LCD.setCursor(0,1); LCD.print("QRD");
+        break;
+      case 9:
+        LCD.print("Reverse >Claw");
+        LCD.setCursor(0,1); LCD.print("QRD");
+        break; 
+      case 10:
+        LCD.print("Reverse Claw");
+        LCD.setCursor(0,1); LCD.print(">QRD");
         break; 
      }
     delay(100);
@@ -140,10 +152,17 @@ void testMenu() {
            t.testMinMotor();
            break;
           case 7:
-            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,MinMotorSpeed->Value);
+            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,StartMotorSpeed->Value, false);
             break;
           case 8:
+            t.testManeuver(LeftTargetDistanceValue->Value,RightTargetDistanceValue->Value,ManeuverLeftConstant->Value,ManeuverRightConstant->Value,StartMotorSpeed->Value, true);
+            break;
+          case 9:
             t.clawTesting();
+            break;
+          case 10:
+            t.testQRDs();
+            break;
         }
       } // if - cross check start button
     }
@@ -274,12 +293,12 @@ void setup()
   DistanceToGate           = new MenuItem("GateDist");
   DistanceAfterGate        = new MenuItem("PostGateDist");
   ThresholdGate            = new MenuItem("ThreshGate");
-  LeftTargetDistanceValue  = new MenuItem("LeftTargetDist");
-  RightTargetDistanceValue = new MenuItem("RightTargetDist");
-  ManeuverLeftConstant     = new MenuItem("LeftManeuvP");
-  ManeuverRightConstant    = new MenuItem("RightManeuvP");
-  MinMotorSpeed            = new MenuItem("MinMotorSpeed");
   DistanceToZipline        = new MenuItem("ZipDist");
+  LeftTargetDistanceValue  = new MenuItem("LTD");
+  RightTargetDistanceValue = new MenuItem("RTD");
+  ManeuverLeftConstant     = new MenuItem("LMP");
+  ManeuverRightConstant    = new MenuItem("RMP");
+  StartMotorSpeed            = new MenuItem("SMSpeed");
   
   menuItems[0]      = Speed; 
   menuItems[1]      = ProportionalGain; 
@@ -292,8 +311,9 @@ void setup()
   menuItems[8]      = RightTargetDistanceValue;
   menuItems[9]      = ManeuverLeftConstant;
   menuItems[10]     = ManeuverRightConstant;
-  menuItems[11]     = MinMotorSpeed;
+  menuItems[11]     = StartMotorSpeed;
   menuItems[12]     = DistanceToZipline;
+
 }
  
 void loop()
