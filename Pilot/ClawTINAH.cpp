@@ -87,10 +87,10 @@ void moveServo(ServoTINAH *servo, int startPos, int endPos, int stepDelayMs) {
         x += (diff > 0) ? 1 : -1;
         servo->write(startPos + x);
         delay(stepDelayMs);
-        LCD.print(startPos + x);
-        LCD.setCursor(0,1);
-        LCD.print(diff);
-        delay(10);
+//        LCD.print(startPos + x);
+//        LCD.setCursor(0,1);
+//        LCD.print(diff);
+//        delay(10);
         LCD.clear();
     }
 }

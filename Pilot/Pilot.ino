@@ -51,7 +51,7 @@ void Pilot() {
 //  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value);
 //  gateSequence->Drive();
 
-    executeRetrivalFSM(20, 5, 200, 90);
+    executeRetrivalFSM(25, 12, 150, 90);
 }
 
 void testMenu() {
@@ -60,7 +60,7 @@ void testMenu() {
   LCD.setCursor(0,1); LCD.print("Test Menu");
   delay(500);
 
-  const int noOfTestOptions = 10; 
+  const int noOfTestOptions = 11; 
   
   TestProcedures t = TestProcedures (); 
   
@@ -102,12 +102,16 @@ void testMenu() {
         LCD.setCursor(0,1); LCD.print("MinMotor >Forward");
         break;
       case 8:
-        LCD.print(">Reverse");
-        LCD.setCursor(0,1); LCD.print("Claw");
+        LCD.print(">Reverse Claw");
+        LCD.setCursor(0,1); LCD.print("QRD");
         break;
       case 9:
-        LCD.print("Reverse");
-        LCD.setCursor(0,1); LCD.print(">Claw");
+        LCD.print("Reverse >Claw");
+        LCD.setCursor(0,1); LCD.print("QRD");
+        break; 
+      case 10:
+        LCD.print("Reverse Claw");
+        LCD.setCursor(0,1); LCD.print(">QRD");
         break; 
      }
     delay(100);
@@ -145,6 +149,9 @@ void testMenu() {
             break;
           case 9:
             t.clawTesting();
+            break;
+          case 10:
+            t.testQRDs();
             break;
         }
       } // if - cross check start button

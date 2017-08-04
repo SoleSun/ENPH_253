@@ -353,23 +353,23 @@ void TestProcedures::testMinMotor() {
 void TestProcedures::testManeuver(int leftTargetDistanceVal,int rightTargetDistanceVal,int maneuverLeftConstantVal,int maneuverRightConstantVal,int startMotorSpeedVal, bool reverse){
 
 
-    while(!stopbutton()){
-        LCD.clear();
-        LCD.home();
-         LCD.print(" CR  "); LCD.print(analogRead(centreRightQRDSensor)); 
-         LCD.print(" CL "); LCD.print(analogRead(centreLeft QRDSensor)); 
-         LCD.setCursor(0,1);
-         LCD.print("L "); LCD.print(analogRead(leftQRDSensor)); 
-         LCD.print(" R "); LCD.print(analogRead(rightQRDSensor)); 
-         delay(100);
-    }
-    return;
+//    while(!stopbutton()){
+//        LCD.clear();
+//        LCD.home();
+//         LCD.print(" CR  "); LCD.print(analogRead(centreRightQRDSensor)); 
+//         LCD.print(" CL "); LCD.print(analogRead(centreLeftQRDSensor)); 
+//         LCD.setCursor(0,1);
+//         LCD.print("L "); LCD.print(analogRead(leftQRDSensor)); 
+//         LCD.print(" R "); LCD.print(analogRead(rightQRDSensor)); 
+//         delay(100);
+//    }
+//    return;
    
-    //maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,startMotorSpeedVal, reverse);
+    maneuver(leftTargetDistanceVal,rightTargetDistanceVal,maneuverLeftConstantVal, maneuverRightConstantVal,startMotorSpeedVal, reverse);
 }
 
 // Teseting procedure for Claw:
-void TestProcedures:: clawTesting(){
+void TestProcedures::clawTesting(){
 
 ////Retrival Agent Arm        
 // #define ARMPIN 9       
@@ -415,5 +415,27 @@ void TestProcedures:: clawTesting(){
         }
         delay(1000);
         }
+}
+
+void TestProcedures::testQRDs() {
+    while(true){
+        LCD.clear(); LCD.home();
+        LCD.print("CL: "); LCD.print(analogRead(centreLeftQRDSensor));
+        LCD.print(" CR: "); LCD.print(analogRead(centreRightQRDSensor));
+        LCD.setCursor(0,1);
+        LCD.print("L: "); LCD.print(analogRead(leftQRDSensor));
+        LCD.print(" R: "); LCD.print(analogRead(rightQRDSensor));
+
+        delay(25);
+
+        if (stopbutton())
+        {
+          delay(100);
+          if (stopbutton())
+            { 
+              return;
+            }
+        }
+    }
 }
 

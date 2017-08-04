@@ -31,7 +31,10 @@
 
 */
 
-enum States{S_TapeFollow, S_Forward, S_Retrieve, S_ForwardLeft, S_Exit};
+enum States{S_TapeFollow,S_Alignment, S_Retrieve, S_Exit};
+
+//enum States{S_TapeFollow,S_Alignment, S_Forward, S_Retrieve, S_ForwardLeft, S_Exit};
+
 extern States g_CurrentState;
 
  
@@ -45,13 +48,16 @@ void rightTurn();
 const bool detectCross();
 
 //State 2: forward offset
-void forward();
+void forward(int distanceToTravel);
+void reverse(int distanceToBack);
 
 // State 3: Retrieve
 void retrieveAgent();
 
 //State 4: 
 void forwardAndLeft();
+
+
 
 const bool backOnTape();
 
