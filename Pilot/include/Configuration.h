@@ -36,7 +36,7 @@
  #define HANDOFFPOSITION 30		
  		
  // Retrival Agent Claw		
- #define	CLAWPIN 8		
+ #define CLAWPIN 8		
  #define CLAWOPENPOSITION 0	
  #define CLAWCLOSEPOSITION 100		
  #define CLAWDELAY 2

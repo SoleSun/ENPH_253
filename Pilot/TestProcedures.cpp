@@ -50,7 +50,7 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
 	while (true) {
 		bool 
 		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
-		CR = analogRead(centreRightQRDSensor) > thresholdVal,
+		CR = analogRead(centreRightQRDSensor) > thresholdVal;
 
 		int error;
 		if ( CL && CR )          error = 0;

@@ -12,10 +12,13 @@ class Zipline_Navigator{
 		int distToZipline;
 		int degreeToTurn;
 		int noOfCrossesEncountered;
+		int rightConst;
+		int leftConst;
 
 		void tapeFollow ();
-		void driveStraight(); 
-		void maneuver ();
+		void driveToZipline(); 
+		void latch (bool drivingOnLeftSurface);
+		void Drive(bool drivingOnLeftSurface);
 		
 	public:
 		Zipline_Navigator (int thresh, int p, int d, int speed, int dist, int degree);

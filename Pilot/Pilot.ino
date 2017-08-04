@@ -21,20 +21,26 @@
 int noOfCrossesEncountered = 0;
 
 uint16_t MenuItem::MenuItemCount = 0;
-/* Add the menu items here */
+/* 
+ *  Add the menu items here 
+ *  WARNING!! When new MenuItems are added,
+ *  make sure to chang the numberOfPIDMenuOptions
+ *  in the Configuration.h file!!
+ *  Bad code I know...
+ */
 MenuItem * Speed;
 MenuItem * ProportionalGain;
 MenuItem * DerivativeGain;
 MenuItem * Threshold; /* Thershold for detecting black line */
-MenuItem * Error;
-MenuItem * DistanceToGate;
-MenuItem * DistanceAfterGate; 
-MenuItem * ThresholdGate;
-MenuItem * LeftTargetDistanceValue;
+MenuItem * DistanceToGate; /* Distance to the gate */
+MenuItem * DistanceAfterGate; /* Distance after gate telling the robot to slow down */
+MenuItem * ThresholdGate; /* IR analog read value for detecting an ON and OFF */
+MenuItem * LeftTargetDistanceValue; 
 MenuItem * RightTargetDistanceValue;
 MenuItem * ManeuverLeftConstant;
 MenuItem * ManeuverRightConstant;
 MenuItem * MinMotorSpeed;
+MenuItem * DistanceToZipline;
 MenuItem * menuItems[numberOfPIDMenuOptions];
 Gate_Navigator * gateSequence;
 
@@ -44,10 +50,13 @@ Gate_Navigator * gateSequence;
 /* 
  *  Mediator responsible for delegating and 
  *  switching between the different states
+ *  
+ *  @param true if the robot is running with the claw facing us;
+ *         else, false
  */
-void Pilot() {
+void Pilot(bool left) {
   gateSequence = 
-  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value);
+  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value, DistanceAfterGate->Value);
   gateSequence->Drive();
   
 }
@@ -209,16 +218,20 @@ void mainMenu()
     LCD.clear(); LCD.home();
     switch (menuIndex){
       case 0:
-        LCD.print("->PID Drive");
-        LCD.setCursor(0,1); LCD.print("Test");
+        LCD.print("->Left Right");
+        LCD.setCursor(0,1); LCD.print("Values Test");
         break;
       case 1:
-        LCD.print("PID ->Drive");
-        LCD.setCursor(0,1); LCD.print("Test");
+        LCD.print("Left ->Right");
+        LCD.setCursor(0,1); LCD.print("Values Test");
         break;
       case 2:
-        LCD.print("PID Drive");
-        LCD.setCursor(0,1); LCD.print("->Test");
+        LCD.print("Values Drive");
+        LCD.setCursor(0,1); LCD.print("->Values Test");
+        break;
+      case 3:
+        LCD.print("Values Drive");
+        LCD.setCursor(0,1); LCD.print("Values ->Test");
         break;
     }
     delay(100);
@@ -228,12 +241,15 @@ void mainMenu()
       if (startbutton()) { 
         switch (menuIndex){
           case 0:
-            PIDMenu();
+            Pilot(true)
             break;
           case 1:
-            Pilot();
+            Pilot(false);
             break;
           case 2:
+            PIDMenu();
+            break;
+          case 3:
             testMenu();
             break;
         }
@@ -255,29 +271,29 @@ void setup()
   ProportionalGain         = new MenuItem("P-gain");
   DerivativeGain           = new MenuItem("D-gain");
   Threshold                = new MenuItem("Threshold");
-  Error                    = new MenuItem("Error");
   DistanceToGate           = new MenuItem("GateDist");
   DistanceAfterGate        = new MenuItem("PostGateDist");
   ThresholdGate            = new MenuItem("ThreshGate");
-  LeftTargetDistanceValue  = new MenuItem("LeftTargetDistance");
-  RightTargetDistanceValue = new MenuItem("RightTargetDistance");
-  ManeuverLeftConstant     = new MenuItem("LeftManeuverP");
-  ManeuverRightConstant    = new MenuItem("RightManeuverP");
+  LeftTargetDistanceValue  = new MenuItem("LeftTargetDist");
+  RightTargetDistanceValue = new MenuItem("RightTargetDist");
+  ManeuverLeftConstant     = new MenuItem("LeftManeuvP");
+  ManeuverRightConstant    = new MenuItem("RightManeuvP");
   MinMotorSpeed            = new MenuItem("MinMotorSpeed");
+  DistanceToZipline        = new MenuItem("ZipDist");
   
   menuItems[0]      = Speed; 
   menuItems[1]      = ProportionalGain; 
   menuItems[2]      = DerivativeGain; 
-  menuItems[3]      = Error;
-  menuItems[4]      = Threshold;
-  menuItems[5]      = DistanceToGate;
-  menuItems[6]      = ThresholdGate;
-  menuItems[7]      = DistanceAfterGate;
-  menuItems[8]      = LeftTargetDistanceValue;
-  menuItems[9]      = RightTargetDistanceValue;
-  menuItems[10]     = ManeuverLeftConstant;
-  menuItems[11]     = ManeuverRightConstant;
-  menuItems[12]     = MinMotorSpeed;
+  menuItems[3]      = Threshold;
+  menuItems[4]      = DistanceToGate;
+  menuItems[5]      = ThresholdGate;
+  menuItems[6]      = DistanceAfterGate;
+  menuItems[7]      = LeftTargetDistanceValue;
+  menuItems[8]      = RightTargetDistanceValue;
+  menuItems[9]      = ManeuverLeftConstant;
+  menuItems[10]     = ManeuverRightConstant;
+  menuItems[11]     = MinMotorSpeed;
+  menuItems[12]     = DistanceToZipline;
 }
  
 void loop()
