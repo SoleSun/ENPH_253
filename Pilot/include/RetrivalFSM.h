@@ -31,7 +31,7 @@
 
 */
 
-enum States{S_TapeFollow,S_Alignment, S_Retrieve, S_Exit};
+enum States{S_TapeFollow,S_Alignment,S_Retrieve, S_TapeAlignment, S_Exit};
 
 //enum States{S_TapeFollow,S_Alignment, S_Forward, S_Retrieve, S_ForwardLeft, S_Exit};
 

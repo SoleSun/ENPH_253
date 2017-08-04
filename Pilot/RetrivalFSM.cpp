@@ -5,11 +5,11 @@
 
 // alignment Parameters
 #define START_SPEED 90
-#define LEFT_FRONT_CONST 6
+#define LEFT_FRONT_CONST 1
 #define RIGHT_FRONT_CONST 1
 #define LEFT_BACK_CONST 1
 #define RIGHT_BACK_CONST 1
-#define FORWARD_LEFT_LEFT_WHEEL_SPEED 50
+#define FORWARD_LEFT_LEFT_WHEEL_SPEED 0
 #define FORWARD_LEFT_RIGHT_WHEEL_SPEED 70
 
 
@@ -22,10 +22,10 @@ int lastError, recentError;
 int q = 0, m = 0, con = 0; 
 
 // Competition Surface Left
-int armDownPositionsLeft[6] = {30, 30,30,30,30,30};
+int armDownPositionsLeft[6] = {0,0,0,0,0,0};
 int alignmentDistanceForwardLeft[6] = {10,10,10,10,10,10};
-int alignmentDistanceBackwardLeft[6] = {10, 10, 10, 10, 10};
-int forwardDistanceLeft[6]= {10, 10, 10, 10, 10};
+int alignmentDistanceBackwardLeft[6] = {3, 10, 10, 10, 10,10};
+int forwardDistanceLeft[6]= {15, 15, 15, 15,20,15};
 
 // StateMachine State:
 States g_CurrentState = S_TapeFollow; 
@@ -59,19 +59,20 @@ void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
     
     while(!fsmDone){
         switch(g_CurrentState){ 
+            LCD.clear();
+                    LCD.home();
+                     LCD.clear();
+                    LCD.print("Cross Detected");
+                   
             case S_TapeFollow:  
              tapeFollow(); 
             // this state just is suppose to follow tape and then stop. 
                 if(detectCross()) {
-                    // stopping the motor:
-//                    motor.speed(leftMotor, 0);
-//                    motor.speed(rightMotor, 0);
+                    //printing for clarification. 
+                    LCD.clear();
+                    LCD.home();
+                    LCD.print("Cross Detected");
 
-//                    //printing for clarification. 
-//                    LCD.clear();
-//                    LCD.home();
-//                    LCD.print("Cross Detected");
-//                    LCD.clear();
 
                     // new state machine: /////////////////////////////////////////////////
                     g_CurrentState = S_Alignment; 
@@ -83,51 +84,75 @@ void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
                 // alignment of the chassis for grabbing the agent.
                 // momve forward, left turn to find the tape, then go backwards. Then go back to tape following. 
                 forward(alignmentDistanceForwardLeft[counter]);
-                while(!backOnTape()){
+
+                LCD.clear();
+                    LCD.home();
+                    LCD.clear();
+                    LCD.print("Alignment Maneuver");
+
+                    // left surface
+                if(counter !=0){
+                    while(!backOnTape()){
                     forwardAndLeft();
+                    }  
                 }
+                
+                
                 reverse(alignmentDistanceBackwardLeft[counter]);
                 g_CurrentState = S_Retrieve; 
+                motor.speed(leftMotor, 0);
+                motor.speed(rightMotor, 0);
+                break; 
 
-                
+
+
+             case S_TapeAlignment:
+                    // go forward:
+                    forward(forwardDistanceLeft[counter]);
+                    // now pivoting the wheel to turn right
+                    while(!analogRead(centreLeftQRDSensor) > threshold){
+                         motor.speed(rightMotor, 0);
+                         motor.speed(leftMotor, -50);
+                    }
+
+                    g_CurrentState = S_TapeFollow;
+                     counter++; 
+                    break;  
             
 //            case S_Forward:
 //                // go slightly forward to align the claw with the animal 
-////                 LCD.clear();
-////                 LCD.home();
-////                 LCD.print("Forward");
-////                 delay(LCDDELAY );
-////                 LCD.clear();
+//                 LCD.clear();
+//                 LCD.home();
+//                 LCD.print("Forward");
+//                 delay(LCDDELAY );
+//                 LCD.clear();
 //
 //                 // calling go forward function.
 //                forward(forwardDistanceLeft[counter]);
 //                 // stopping the motor:
 //                motor.speed(leftMotor, 0);
 //                motor.speed(rightMotor, 0);
-//
-//                // setting the speeds for the motors as well as switching the states. 
-//                //g_CurrentState = S_Retrieve;
-//
-//                ////////////////////////////////////// new state machine
-//
-//                g_CurrentState = S_ForwardLeft; 
-//                break;
+
+                // setting the speeds for the motors as well as switching the states. 
+                //g_CurrentState = S_Retrieve;
+
+                ////////////////////////////////////// new state machine
+
+               g_CurrentState = S_TapeFollow; 
+                break;
                     
             
             case S_Retrieve:
-//                LCD.clear();
-//                LCD.home();
-//                LCD.print("Retrieve");    
+                LCD.clear();
+                LCD.home();
+                LCD.print("Retrieve");    
 //                delay(LCDDELAY);
 
-                    motor.speed(leftMotor, 0);
-                    motor.speed(rightMotor, 0);
                  // if not grabbed 6 agents yets, retrieve more. 
                 if (counter >= 0 && counter < 6){
                     newClaw.retrieve(armDownPositionsLeft[counter]);
-                    counter++; 
                    // newt state machine:
-                   g_CurrentState = S_TapeFollow;
+                   g_CurrentState = S_TapeAlignment;
                 } 
                 else if(counter >=6){
                     // if 6 agents have been grabbed, switch states correspodningly.
@@ -230,7 +255,7 @@ const bool backOnTape(){
         CR = analogRead(centreRightQRDSensor) > threshold;
         
 
-    if( CL)
+    if( CR)
         return true;
     else 
         return false; 
@@ -250,8 +275,8 @@ void  tapeFollow(){
         else if ( CL && !CR )    error = -1;
         else if ( !CL && CR )    error = 1;
         else{
-           if( lastError > 0 )    error = 2;
-           else                 error = -2;
+           if( lastError < 0 )    error = -2;
+           else                 error = 2;
         }
         if(!(error == lastError)){
           recentError = lastError;
@@ -297,7 +322,7 @@ void  tapeFollow(){
         
        //make the motors travel forward but veer off to the left. The numbers needs to be tuned. 
        motor.speed(leftMotor, FORWARD_LEFT_LEFT_WHEEL_SPEED);
-       motor.speed(leftMotor, FORWARD_LEFT_RIGHT_WHEEL_SPEED);
+       motor.speed(rightMotor, FORWARD_LEFT_RIGHT_WHEEL_SPEED);
     
  }
 
