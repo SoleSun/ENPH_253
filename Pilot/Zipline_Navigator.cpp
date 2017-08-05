@@ -1,7 +1,7 @@
 #include <phys253.h>
 #include <LiquidCrystal.h>
 #include "include/Zipline_Navigator.h"
-#include "include/RetrievalFSM.h"
+#include "include/RetrivalFSM.h"
 
 Zipline_Navigator::Zipline_Navigator (int thresh, int p, int d, int speed, int dist, int degree, int rightConstant, int leftConstant){
 	thresholdVal = thresh;

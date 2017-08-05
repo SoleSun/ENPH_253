@@ -41,8 +41,7 @@ MenuItem * RightTargetDistanceValue;
 MenuItem * ManeuverLeftConstant;
 MenuItem * ManeuverRightConstant;
 MenuItem * DistanceToZipline;
-MenuItem * StartMotorSpeed;        
-MenuItem * StartMotorSpeed;        
+MenuItem * StartMotorSpeed;          
 MenuItem * menuItems[numberOfPIDMenuOptions];
 Gate_Navigator * gateSequence;
 
@@ -59,7 +58,7 @@ Gate_Navigator * gateSequence;
 void Pilot(bool left) {
   gateSequence = 
   new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value, DistanceAfterGate->Value);
-  gateSequence->Drive();
+  gateSequence->Drive(left);
 
   executeRetrivalFSM(25, 12, 150, 90);
 }
@@ -245,11 +244,11 @@ void mainMenu()
         LCD.setCursor(0,1); LCD.print("Values Test");
         break;
       case 2:
-        LCD.print("Values Drive");
+        LCD.print("Left Drive");
         LCD.setCursor(0,1); LCD.print("->Values Test");
         break;
       case 3:
-        LCD.print("Values Drive");
+        LCD.print("Left Drive");
         LCD.setCursor(0,1); LCD.print("Values ->Test");
         break;
     }
@@ -260,7 +259,7 @@ void mainMenu()
       if (startbutton()) { 
         switch (menuIndex){
           case 0:
-            Pilot(true)
+            Pilot(true);
             break;
           case 1:
             Pilot(false);
@@ -298,7 +297,7 @@ void setup()
   RightTargetDistanceValue = new MenuItem("RTD");
   ManeuverLeftConstant     = new MenuItem("LMP");
   ManeuverRightConstant    = new MenuItem("RMP");
-  StartMotorSpeed            = new MenuItem("SMSpeed");
+  StartMotorSpeed          = new MenuItem("SMSpeed");
   
   menuItems[0]      = Speed; 
   menuItems[1]      = ProportionalGain; 

@@ -19,6 +19,10 @@ Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int de
  * for a slower speed
  */
 void Gate_Navigator::driveSlow(){
+  thresholdVal   = 150;
+  speedVal       = 90;
+  proportionalVal = 25;
+  derivativeVal  = 12;
 }
 
 /**
@@ -128,9 +132,11 @@ bool Gate_Navigator::Drive(bool drivingOnLeftSurface) {
       if (  error == 10 && (millis() - offset > minimumTimeToReachCrossBar)) {
         LCD.print("Cross"); LCD.setCursor(0,1); LCD.print("Detected");
 
-        /* Steer hard left on the surface  */
-        motor.speed(leftMotor, -speedVal);    motor.speed(rightMotor, -speedVal);
-
+        while (analogRead(centreLeftQRDSensor) < thresholdVal) {
+          /* Steer hard left on the surface  */
+          motor.speed(leftMotor, -speedVal);    motor.speed(rightMotor, -speedVal);
+        }
+        
         return true;
       }
       

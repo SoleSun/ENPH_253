@@ -42,6 +42,7 @@ int Encoder::getTicks (unsigned int INTX){
   return counts[INTX];
 }
 
+/*
  *  @return value the right encoder has travelled in centimeters
  */
 int Encoder::getDistanceRightWheel(){

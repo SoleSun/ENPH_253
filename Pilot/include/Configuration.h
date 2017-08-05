@@ -2,7 +2,7 @@
 #define rightMotor 3
 
 /* Menu Options */
-#define numberOfMainMenuOptions 3
+#define numberOfMainMenuOptions 4
 #define numberOfPIDMenuOptions 13
 
 /* Gate Sensor Pins */
