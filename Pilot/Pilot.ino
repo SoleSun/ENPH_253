@@ -13,7 +13,7 @@
 #include "include/Gate_Navigator.h"
 #include "include/TestProcedures.h"
 #include "include/RetrivalFSM.h"
-
+#include "include/Zipline_Navigator.h"
 /*
  * A cross is black tape that crosses the path, indicating either the entrance
  * to the agent bowl or the location of the agents. Once the first cross is 
@@ -41,9 +41,11 @@ MenuItem * RightTargetDistanceValue;
 MenuItem * ManeuverLeftConstant;
 MenuItem * ManeuverRightConstant;
 MenuItem * DistanceToZipline;
-MenuItem * StartMotorSpeed;          
+MenuItem * StartMotorSpeed;   
+MenuItem * HowLongToTurn;        
 MenuItem * menuItems[numberOfPIDMenuOptions];
 Gate_Navigator * gateSequence;
+Zipline_Navigator * ziplineSequence;
 
 // *array[1]
 // **(array + 1)
@@ -56,11 +58,14 @@ Gate_Navigator * gateSequence;
  *         else, false
  */
 void Pilot(bool left) {
-  gateSequence = 
-  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value, DistanceAfterGate->Value);
-  gateSequence->Drive(left);
+//  gateSequence = 
+//  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value, DistanceAfterGate->Value);
+//  gateSequence->Drive(left);
+//
+//  executeRetrivalFSM(25, 12, 150, 90);
 
-  executeRetrivalFSM(25, 12, 150, 90);
+  ziplineSequence = 
+  new Zipline_Navigator (150, 25, 12, 90, DistanceToZipline->Value, HowLongToTurn->Value, ManeuverRightConstant->Value, ManeuverLeftConstant->Value);
 }
 
 void testMenu() {
@@ -298,6 +303,7 @@ void setup()
   ManeuverLeftConstant     = new MenuItem("LMP");
   ManeuverRightConstant    = new MenuItem("RMP");
   StartMotorSpeed          = new MenuItem("SMSpeed");
+  HowLongToTurn            = new MenuItem("Turn");
   
   menuItems[0]      = Speed; 
   menuItems[1]      = ProportionalGain; 
@@ -312,6 +318,7 @@ void setup()
   menuItems[10]     = ManeuverRightConstant;
   menuItems[11]     = StartMotorSpeed;
   menuItems[12]     = DistanceToZipline;
+  menuItems[13]     = HowLongToTurn;
 
 }
  

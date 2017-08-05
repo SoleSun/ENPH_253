@@ -30,11 +30,11 @@ void Zipline_Navigator::tapeFollow() {
 	const int minimumCrosses = 3;
 	while (true){
 	  
-  		bool 
-  		L = analogRead(leftQRDSensor) > thresholdVal,
-  		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
-  		CR = analogRead(centreRightQRDSensor) > thresholdVal,
-  		R = analogRead(rightQRDSensor) > thresholdVal; 
+		bool 
+		L = analogRead(leftQRDSensor) > thresholdVal,
+		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
+		CR = analogRead(centreRightQRDSensor) > thresholdVal,
+		R = analogRead(rightQRDSensor) > thresholdVal; 
 
 		if (  (CL && CR) && (R || L)  ){
 			noOfCrossesEncountered++;
@@ -63,12 +63,6 @@ void Zipline_Navigator::tapeFollow() {
   		motor.speed(rightMotor, speedVal + con);
   	  
   		lastError = error;
-
-      LCD.print("L "); LCD.print(analogRead(centreLeftQRDSensor)); 
-      LCD.print(" R "); LCD.print(analogRead(centreRightQRDSensor)); 
-      LCD.setCursor(0,1); LCD.print("IR"); LCD.print(analogRead(OneKHzSensorPin));
-      delay(15);
-
   	}
 }
 
@@ -78,6 +72,8 @@ void Zipline_Navigator::tapeFollow() {
  */
 void Zipline_Navigator::driveToZipline() {
   maneuver(distToZipline, distToZipline, leftConst, rightConst, speedVal, false);
+  Claw newClaw(CLAWOPENPOSITION, CLAWCLOSEPOSITION, ARMUPPOSITION,CLAWDELAY, ARMDELAY, CLAWPIN, ARMPIN); 
+  newClaw.stageThreeConfiguration();
 }
 
 /**
@@ -88,36 +84,80 @@ void Zipline_Navigator::driveToZipline() {
 void Zipline_Navigator::latch(bool drivingOnLeftSurface) {
 	if (drivingOnLeftSurface){
     /* Turn Right */
-    motor.speed(leftMotor, speedVal);    motor.speed(rightMotor, speedVal);
-    delay(25);
+    motor.speed(leftMotor, 0);    motor.speed(rightMotor, speedVal);
+    delay(degreeToTurn);
+    /* Stop after turning */
+	  motor.speed(leftMotor, 0);    motor.speed(rightMotor, 0);
 	} else {
     /* Turn Left */
-    motor.speed(leftMotor, -speedVal);    motor.speed(rightMotor, -speedVal);
-    delay(25);    
+    motor.speed(leftMotor, 0);    motor.speed(rightMotor, -speedVal);
+    delay(degreeToTurn);
+    /* Stop after turning */
+    motor.speed(leftMotor, 0);    motor.speed(rightMotor, 0);
+    /* Claw is close to zipline. Move backwards and give the lift some space */
+    maneuver (50, 50, leftConst, rightConst, speedVal, true);    
 	}
 
-  /* Reverse direction and move backwards */
-  maneuver (50, 50, leftConst, rightConst, speedVal, true);
+  /* Lift the box with the animals */
+  lift();
 
-  /* Lift the box*/
-  for (int angle = 0; angle <= 180; angle++){
-    RCServo0.write(angle);  RCServo1.write(180 - angle);
-    delay(15);
+  /* Now slowly foward move */
+  maneuver (15,15,leftConst, rightConst, speedVal, false);
+
+  lower(); 
+  
+  return;
+}
+
+void Zipline_Navigator::lift(){
+  const int initalizedangle = 177, servo0 = 15, servo2 = 63;
+  int incrementstandard = initalizedangle - servo2,
+      s0increment = (initalizedangle - servo0)/incrementstandard,
+      s2increment = (initalizedangle - servo2)/incrementstandard;
+  
+  // 102 + 8 = 110 must be << 114(max increment for servo2)
+  for (int i = 0; i <= 102; i++){
+    if ( i > 0 && i < 102){
+      RCServo0.write(initalizedangle - 40 - i);    RCServo1.write(initalizedangle - 8 - i);
+    }
+    else if (i == 0){
+      RCServo0.write(initalizedangle - 37);        RCServo1.write(initalizedangle - 8);
+    }
+    else{
+      RCServo0.write(servo0);      RCServo1.write(servo2);
+    }
+    delay(100);
   }
 
-  /*Move forward */
-  maneuver (50,50,leftConst, rightConst, speedVal, false);
+  return;
+}
 
-  /* Lower the box*/
-  for (int angle = 180; angle >= 0; angle--){
-    RCServo0.write(angle);  RCServo1.write(180 - angle);
-    delay(15);
+void Zipline_Navigator::lower(){
+  const int initalizedangle = 177, servo0 = 15, servo2 = 63;
+  int incrementstandard = initalizedangle - servo2,
+      s0increment = (initalizedangle - servo0)/incrementstandard,
+      s2increment = (initalizedangle - servo2)/incrementstandard;
+
+  // 102 + 8 = 110 must be << 114(max increment for servo2)
+  for (int i = 102; i >= 0; i--){
+    if ( i > 0 && i < 102){
+      RCServo0.write(initalizedangle - 40 - i);    RCServo1.write(initalizedangle - 8 - i);
+    }
+    else if (i == 0){
+      RCServo0.write(initalizedangle - 37);        RCServo1.write(initalizedangle - 8);
+    }
+    else{
+      RCServo0.write(servo0);      RCServo1.write(servo2);
+    }
+    delay(100);
   }
 
   return;
 }
 
 void Zipline_Navigator::Drive(bool drivingOnLeftSurface){
-  
+  tapeFollow();
+  driveToZipline();
+  latch(drivingOnLeftSurface);
 }
 

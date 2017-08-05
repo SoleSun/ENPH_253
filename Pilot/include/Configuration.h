@@ -3,7 +3,7 @@
 
 /* Menu Options */
 #define numberOfMainMenuOptions 4
-#define numberOfPIDMenuOptions 13
+#define numberOfPIDMenuOptions 14
 
 /* Gate Sensor Pins */
 #define OneKHzSensorPin 4
@@ -31,7 +31,7 @@
 
 //Retrival Agent Arm		
  #define ARMPIN 9		
- #define ARMUPPOSITION 180	
+ #define ARMUPPOSITION 150
  #define ARMDELAY 5		
  #define HANDOFFPOSITION 30		
  		

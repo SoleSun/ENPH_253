@@ -9,8 +9,8 @@ public:
 int armStepDelay, int clawPin, int armPin);
     void retrieve(int);
     void clawSetUp();
-    void armDown();
-    void clawGateConfiguration();
+    void armDown(int);
+    void stageThreeConfiguration();
     
  // can ignore this
     Claw(const Claw &);

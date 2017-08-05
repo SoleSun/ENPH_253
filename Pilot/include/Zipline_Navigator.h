@@ -18,6 +18,8 @@ class Zipline_Navigator{
 		void tapeFollow ();
 		void driveToZipline(); 
 		void latch (bool drivingOnLeftSurface);
+		void lift ();
+		void lower ();
 		void Drive(bool drivingOnLeftSurface);
 		
 	public:
