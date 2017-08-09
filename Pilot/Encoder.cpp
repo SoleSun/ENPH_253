@@ -42,18 +42,18 @@ int Encoder::getTicks (unsigned int INTX){
   return counts[INTX];
 }
 
-/* 
+/*
  *  @return value the right encoder has travelled in centimeters
  */
 int Encoder::getDistanceRightWheel(){
-	return (int) ((counts[rightEncoder] * wheelDiameter * pi) / (gearRatio * 44));
+	return (int) ((counts[rightEncoder] * wheelDiameter * pi) / (gearRatio * 48));
 }
 
 /* 
  *  @return value the left encoder has travelled in centimeters
  */
 int Encoder::getDistanceLeftWheel(){
-	return (int) ((counts[leftEncoder] * wheelDiameter * pi) / (gearRatio * 44));
+	return (int) ((counts[leftEncoder] * wheelDiameter * pi) / (gearRatio * 48));
 }
 
 int Encoder::convertDistToTicks (unsigned int distance) {

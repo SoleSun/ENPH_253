@@ -4,15 +4,26 @@
 #include "include/Encoder.h"
 #include "include/Gate_Navigator.h"
 
-Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int derivativeGain, int motorSpeed, int distanceToGate, int threshGate/*, int distanceAfterGate*/) {
+Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int derivativeGain, int motorSpeed, int distanceToGate, int threshGate, int distanceAfterGate) {
 	thresholdVal = thresholdValue;
 	proportionalVal = proportionalGain;
 	derivativeVal = derivativeGain;
 	speedVal = motorSpeed;
   distToGateVal = distanceToGate;
   threshGateVal = threshGate;
-  //distanceAfterGateVal = distanceAfterGate;
+  distanceAfterGateVal = distanceAfterGate;
 };
+
+/**
+ * Change the hard-coded PID parameters
+ * for a slower speed
+ */
+void Gate_Navigator::driveSlow(){
+  thresholdVal   = 150;
+  speedVal       = 90;
+  proportionalVal = 25;
+  derivativeVal  = 12;
+}
 
 /**
  * @return 10 if all four sensors have been activated; else follow truth table
@@ -55,12 +66,14 @@ int Gate_Navigator::getErrorValue(int prevError) {
 }
 
 /*
+ * @param true if the robot is running on the surface with the
+ * claw facing outwards
  * @return true if the first cross has been detected 
  */
-bool Gate_Navigator::Drive() {
+bool Gate_Navigator::Drive(bool drivingOnLeftSurface) {
   int lastError = 0, recentError = 0;
   int q = 0, m = 0, con = 0;
-  const int minimumTimeToReachCrossBar = 8000;
+  const int minimumTimeToReachCrossBar = 5000;
 
   Encoder distCalculator = Encoder();
   
@@ -81,9 +94,13 @@ bool Gate_Navigator::Drive() {
     
     /* The distance that was travelled so far */
   	int averageDist = (distCalculator.getDistanceRightWheel() + distCalculator.getDistanceLeftWheel()) / 2;
-      
+
+    if (averageDist > distanceAfterGateVal) {
+      driveSlow();
+    }
+    
     /* If the beacon is not flashing 1 KHz and the robot has already travelled its allotted safe distance */
-  	if (averageDist > distToGateVal && !stoppedOnce) {
+  	if (!stoppedOnce && averageDist > distToGateVal) {
 
       /* Stop the robot */
       motor.speed(leftMotor, 0);
@@ -97,17 +114,15 @@ bool Gate_Navigator::Drive() {
         LCD.clear(); LCD.home();
         LCD.print("Stop Dist: "); LCD.print(averageDist); 
         LCD.setCursor(0,1); LCD.print("QSD: "); LCD.print(analogRead (OneKHzSensorPin));
+        delay(15);
       }
       while (analogRead(OneKHzSensorPin) > threshGateVal){ 
         /* If the gate is initially off, then it will catch on this one*/
         LCD.clear(); LCD.home();
         LCD.print("Stop Dist: "); LCD.print(averageDist); 
         LCD.setCursor(0,1); LCD.print("QSD: "); LCD.print(analogRead (OneKHzSensorPin));
+        delay(15);
       }
-
-      motor.speed(leftMotor, -255);
-      motor.speed(rightMotor, 255);
-      delay(10);
   	}
     else {
       /* Check the QRD sensors */
@@ -116,25 +131,15 @@ bool Gate_Navigator::Drive() {
       /* If a crossbar has been detected and the robot has been following for some time */
       if (  error == 10 && (millis() - offset > minimumTimeToReachCrossBar)) {
         LCD.print("Cross"); LCD.setCursor(0,1); LCD.print("Detected");
-        motor.speed(leftMotor, 0);
-        motor.speed(rightMotor, 0);
+
+        while (analogRead(centreLeftQRDSensor) < thresholdVal) {
+          /* Steer hard left on the surface  */
+          motor.speed(leftMotor, -speedVal);    motor.speed(rightMotor, -speedVal);
+        }
+        
         return true;
       }
-
-//      unsigned long
-//      newNoOfRightTicks =  distCalculator.getTicks(rightEncoder),
-//      newNoOfLeftTicks  = distCalculator.getTicks(leftEncoder);
-//
-//      /* Ticks have not been generated for the last two seconds, accelerate*/
-//      if ((newNoOfRightTicks - noOfRightTicks < 2 || newNoOfLeftTicks - noOfLeftTicks < 2) && (stuck - millis() > 2000)){
-//        motor.speed(-leftMotor, -255);
-//        motor.speed(rightMotor, 255);
-//        stuck = millis();
-//        delay(25);
-//      }
-//      
-//      noOfRightTicks = newNoOfRightTicks; noOfLeftTicks = newNoOfLeftTicks;
-  	  
+      
   		if(error != lastError){
   		  recentError = lastError;
   		  q=m;
@@ -146,18 +151,14 @@ bool Gate_Navigator::Drive() {
   		con = proportional + derivative;
   	  
   		m++;
-  		motor.speed(leftMotor, -speedVal + con);
-  		motor.speed(rightMotor, speedVal + con);
+  		motor.speed(leftMotor, -speedVal + con);    motor.speed(rightMotor, speedVal + con);
   	  
   		lastError = error;
-
-      LCD.print(speedVal); LCD.print(" "); LCD.print(proportionalVal); 
-      LCD.print(" "); LCD.print(derivativeVal); LCD.print(" "); LCD.print(distToGateVal);
-      LCD.setCursor(0,1);
+      
       LCD.print("L "); LCD.print(analogRead(centreLeftQRDSensor)); 
       LCD.print(" R "); LCD.print(analogRead(centreRightQRDSensor)); 
-      LCD.print(" IR"); LCD.print(analogRead(OneKHzSensorPin));
-      delay(25);
+      LCD.setCursor(0,1); LCD.print("IR"); LCD.print(analogRead(OneKHzSensorPin));
+      delay(15);
   	}
 
     if (stopbutton()) {

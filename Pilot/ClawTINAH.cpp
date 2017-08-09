@@ -35,8 +35,8 @@ void Claw::retrieve(int armDownPosition){
     p_armDownPosition = armDownPosition;
     
     // grabbing the agent
-    this->armDown();
-    this->clawClose();
+    this->armDown(armDownPosition);
+    //this->clawClose();
 
     delay(1000);
     //dropping into the box
@@ -54,9 +54,9 @@ void Claw::clawSetUp(){
     
 }
 
-void Claw:: clawGateConfiguration(){
-     p_claw->write(p_clawClosePosition);
-    p_arm->write(p_armDownPosition+20);
+void Claw:: stageThreeConfiguration(){
+     this -> armDown(10);
+    this -> clawClose();
 }
 
 
@@ -70,9 +70,9 @@ void Claw::clawClose(){
     moveServo(p_claw, p_clawOpenPosition, p_clawClosePosition, p_clawStepDelay);
 }
 
-void Claw::armDown(){
+void Claw::armDown(int armDownPosition){
     // moving the arm down
-    moveServo(p_arm,p_armUpPosition, p_armDownPosition, p_armStepDelay);
+    moveServo(p_arm,p_armUpPosition, armDownPosition, p_armStepDelay);
 }
 
 void Claw::armUp(){

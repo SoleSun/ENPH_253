@@ -184,6 +184,9 @@ void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
                 fsmDone = true; 
                 counter = 0; 
                 g_CurrentState = S_TapeFollow;
+
+                // dropping the claw: 
+                
                 break; 
             
             default:

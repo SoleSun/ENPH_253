@@ -48,7 +48,9 @@ void TestProcedures::testPID(int thresholdVal, int proportionalVal, int derivati
 	delay(1000);
   
 	while (true) {
-		bool CL = analogRead(centreLeftQRDSensor) > thresholdVal,
+
+		bool 
+		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
 		CR = analogRead(centreRightQRDSensor) > thresholdVal;
 
 		int error;
@@ -407,7 +409,6 @@ void TestProcedures::clawTesting(){
             delay(500);
             LCD.clear();
             newClaw.retrieve(armDownDegree);
-
             LCD.print("Detaching");
         }else if (stopbutton()){
             LCD.print("quiting");

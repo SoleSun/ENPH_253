@@ -2,8 +2,8 @@
 #define rightMotor 3
 
 /* Menu Options */
-#define numberOfMainMenuOptions 3
-#define numberOfPIDMenuOptions 13
+#define numberOfMainMenuOptions 4
+#define numberOfPIDMenuOptions 14
 
 /* Gate Sensor Pins */
 #define OneKHzSensorPin 4
@@ -31,12 +31,12 @@
 
 //Retrival Agent Arm		
  #define ARMPIN 9		
- #define ARMUPPOSITION 180	
+ #define ARMUPPOSITION 150
  #define ARMDELAY 5		
  #define HANDOFFPOSITION 30		
  		
  // Retrival Agent Claw		
- #define	CLAWPIN 8		
+ #define CLAWPIN 8		
  #define CLAWOPENPOSITION 0	
  #define CLAWCLOSEPOSITION 100		
  #define CLAWDELAY 2
