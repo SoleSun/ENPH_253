@@ -22,7 +22,7 @@ int lastError, recentError;
 int q = 0, m = 0, con = 0; 
 
 // Competition Surface Left
-int armDownPositionsLeft[6] = {0,0,0,0,0,0};
+int armDownPositionsLeft[6] = {10,5,5,5,5,5};
 int alignmentDistanceForwardLeft[6] = {10,10,10,10,10,10};
 int alignmentDistanceBackwardLeft[6] = {3, 10, 10, 10, 10,10};
 int forwardDistanceLeft[6]= {15, 15, 15, 15,20,15};
@@ -110,10 +110,10 @@ void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
                     // go forward:
                     forward(forwardDistanceLeft[counter]);
                     // now pivoting the wheel to turn right
-                    while(!analogRead(centreLeftQRDSensor) > threshold){
-                         motor.speed(rightMotor, 0);
-                         motor.speed(leftMotor, -50);
-                    }
+//                    while(!analogRead(centreLeftQRDSensor) > threshold){
+//                         motor.speed(rightMotor, 0);
+//                         motor.speed(leftMotor, -50);
+//                    }
 
                     g_CurrentState = S_TapeFollow;
                      counter++; 
@@ -158,6 +158,9 @@ void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
                     // if 6 agents have been grabbed, switch states correspodningly.
                     g_CurrentState = S_Exit;
                 }
+
+                // resetting errors:
+                lastError = 0; 
                 break; 
             
             
@@ -184,9 +187,7 @@ void executeRetrivalFSM(int p, int d, int QRDthreshold, int MotorSpeed){
                 fsmDone = true; 
                 counter = 0; 
                 g_CurrentState = S_TapeFollow;
-
-                // dropping the claw: 
-                
+                motor.speed(leftMotor, 0);    motor.speed(rightMotor,0);
                 break; 
             
             default:

@@ -20,10 +20,9 @@ class Zipline_Navigator{
 		void latch (bool drivingOnLeftSurface);
 		void lift ();
 		void lower ();
-		void Drive(bool drivingOnLeftSurface);
 		
 	public:
 		Zipline_Navigator (int thresh, int p, int d, int speed, int dist, int degree, int rightConstant, int leftConstant);
 		~Zipline_Navigator();
-		void navigate ();
+		void Drive(bool drivingOnLeftSurface);
 };

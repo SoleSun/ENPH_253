@@ -27,43 +27,61 @@ void Zipline_Navigator::tapeFollow() {
 	Assuming the zipline navigator takes control after six crosses, 
 	the minimum number of crosses to traverse is three
 	*/
-	const int minimumCrosses = 3;
+	const int maximumCrosses = 1;
 	while (true){
-	  
-		bool 
-		L = analogRead(leftQRDSensor) > thresholdVal,
-		CL = analogRead(centreLeftQRDSensor) > thresholdVal,
-		CR = analogRead(centreRightQRDSensor) > thresholdVal,
-		R = analogRead(rightQRDSensor) > thresholdVal; 
 
-		if (  (CL && CR) && (R || L)  ){
-			noOfCrossesEncountered++;
-      delay(25);
-			if (noOfCrossesEncountered == 3) return;
-		}
+    LCD.clear(); LCD.home();
+
+    bool CR, CL;
+    
+		if ( (analogRead(centreRightQRDSensor) > thresholdVal || analogRead(centreLeftQRDSensor) > thresholdVal) && (analogRead(rightQRDSensor) > thresholdVal || analogRead(leftQRDSensor) > thresholdVal)){
+      noOfCrossesEncountered++;
       
-  		int error;
-  		if ( CL && CR )          error = 0;
-  		else if ( CL && !CR )    error = -1;
-  		else if ( !CL && CR )    error = 1;
-  		else               		   error = (lastError > 0) ? 2 : -2;
-  		
-  		if(!(error == lastError)){
-  		  recentError = lastError;
-  		  q=m;
-  		  m=1;
-  		}
-  	  
-  		int proportional = proportionalVal * error,
-  			derivative   = (int) (derivativeVal * (float)(error - recentError) / (q + m) );
-  		con = proportional + derivative;
-  	  
-  		m++;
-  		motor.speed(leftMotor, -speedVal + con);
-  		motor.speed(rightMotor, speedVal + con);
-  	  
-  		lastError = error;
-  	}
+      motor.speed(rightMotor, 0);    motor.speed(leftMotor, 0);    delay(1000);    
+
+       LCD.print("Cross Detected");
+      LCD.setCursor(0,1);
+      LCD.print(noOfCrossesEncountered);
+      
+      forward(15);
+      // now pivoting the wheel to turn right
+      
+      while(analogRead(centreLeftQRDSensor) < thresholdVal){
+           motor.speed(rightMotor, 65);    motor.speed(leftMotor, 65);
+      }
+      motor.speed(rightMotor, 0);    motor.speed(leftMotor, 0);   delay(1000);
+			
+			if (noOfCrossesEncountered > maximumCrosses) {
+			  return;
+		  }
+     
+		}
+   
+    CL = analogRead(centreLeftQRDSensor) > thresholdVal;
+    CR = analogRead(centreRightQRDSensor) > thresholdVal;
+      
+		int error;
+		if ( CL && CR )          error = 0;
+		else if ( CL && !CR )    error = -1;
+		else if ( !CL && CR )    error = 1;
+		else               		   error = (lastError > 0) ? 2 : -2;
+		
+		if(!(error == lastError)){
+		  recentError = lastError;
+		  q=m;
+		  m=1;
+		}
+	  
+		int proportional = proportionalVal * error,
+			derivative   = (int) (derivativeVal * (float)(error - recentError) / (q + m) );
+		con = proportional + derivative;
+	  
+		m++;
+		motor.speed(leftMotor, -speedVal + con);
+		motor.speed(rightMotor, speedVal + con);
+	  
+		lastError = error;
+	}
 }
 
 /**
@@ -84,14 +102,15 @@ void Zipline_Navigator::driveToZipline() {
 void Zipline_Navigator::latch(bool drivingOnLeftSurface) {
 	if (drivingOnLeftSurface){
     /* Turn Right */
-    motor.speed(leftMotor, 0);    motor.speed(rightMotor, speedVal);
-    delay(degreeToTurn);
+    motor.speed(leftMotor, 90);    motor.speed(rightMotor, 90);
+    delay(100);
     /* Stop after turning */
 	  motor.speed(leftMotor, 0);    motor.speed(rightMotor, 0);
-	} else {
+	} 
+	else {
     /* Turn Left */
-    motor.speed(leftMotor, 0);    motor.speed(rightMotor, -speedVal);
-    delay(degreeToTurn);
+    motor.speed(leftMotor, -90);    motor.speed(rightMotor, -90);
+    delay(100);
     /* Stop after turning */
     motor.speed(leftMotor, 0);    motor.speed(rightMotor, 0);
     /* Claw is close to zipline. Move backwards and give the lift some space */
@@ -99,12 +118,12 @@ void Zipline_Navigator::latch(bool drivingOnLeftSurface) {
 	}
 
   /* Lift the box with the animals */
-  lift();
+  //lift();
 
   /* Now slowly foward move */
   maneuver (15,15,leftConst, rightConst, speedVal, false);
 
-  lower(); 
+  //lower(); 
   
   return;
 }
@@ -157,6 +176,7 @@ void Zipline_Navigator::lower(){
 
 void Zipline_Navigator::Drive(bool drivingOnLeftSurface){
   tapeFollow();
+  motor.speed(leftMotor,0); motor.speed(rightMotor, 0);
   driveToZipline();
   latch(drivingOnLeftSurface);
 }

@@ -38,5 +38,5 @@
  // Retrival Agent Claw		
  #define CLAWPIN 8		
  #define CLAWOPENPOSITION 0	
- #define CLAWCLOSEPOSITION 100		
+ #define CLAWCLOSEPOSITION 110		
  #define CLAWDELAY 2

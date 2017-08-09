@@ -34,7 +34,7 @@ void Claw::retrieve(int armDownPosition){
     
     // grabbing the agent
     this->armDown(armDownPosition);
-    //this->clawClose();
+    this->clawClose();
 
     delay(1000);
     //dropping into the box
@@ -53,7 +53,7 @@ void Claw::clawSetUp(){
 }
 
 void Claw:: stageThreeConfiguration(){
-     this -> armDown(10);
+     this -> armDown(20);
     this -> clawClose();
 }
 

@@ -46,8 +46,6 @@ MenuItem * HowLongToTurn;
 MenuItem * menuItems[numberOfPIDMenuOptions];
 Gate_Navigator * gateSequence;
 Zipline_Navigator * ziplineSequence;
-
-// *array[1]
 // **(array + 1)
 
 /* 
@@ -58,14 +56,15 @@ Zipline_Navigator * ziplineSequence;
  *         else, false
  */
 void Pilot(bool left) {
-//  gateSequence = 
-//  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value, DistanceAfterGate->Value);
-//  gateSequence->Drive(left);
-//
-//  executeRetrivalFSM(25, 12, 150, 90);
+  gateSequence = 
+  new Gate_Navigator (Threshold->Value, ProportionalGain->Value, DerivativeGain->Value, Speed->Value, DistanceToGate->Value, ThresholdGate->Value, DistanceAfterGate->Value);
+  gateSequence->Drive(left);
+
+  executeRetrivalFSM(25, 12, 150, 90);
 
   ziplineSequence = 
   new Zipline_Navigator (150, 25, 12, 90, DistanceToZipline->Value, HowLongToTurn->Value, ManeuverRightConstant->Value, ManeuverLeftConstant->Value);
+  ziplineSequence->Drive(left);
 }
 
 void testMenu() {
@@ -234,6 +233,8 @@ void mainMenu()
   LCD.clear(); LCD.home();
   LCD.print("Entering menu");
   delay(500);
+
+  RCServo0.write(177);    RCServo1.write(177);
  
   while (true){
     int menuIndex = map(knob(6), 0, 1024, 0, numberOfMainMenuOptions); /* Menu items plus the Drive option */
@@ -249,11 +250,11 @@ void mainMenu()
         LCD.setCursor(0,1); LCD.print("Values Test");
         break;
       case 2:
-        LCD.print("Left Drive");
+        LCD.print("Left Right");
         LCD.setCursor(0,1); LCD.print("->Values Test");
         break;
       case 3:
-        LCD.print("Left Drive");
+        LCD.print("Left Right");
         LCD.setCursor(0,1); LCD.print("Values ->Test");
         break;
     }
