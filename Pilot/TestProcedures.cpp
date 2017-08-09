@@ -407,6 +407,8 @@ void TestProcedures::clawTesting(){
             delay(500);
             LCD.clear();
             newClaw.retrieve(armDownDegree);
+
+            LCD.print("Detaching");
         }else if (stopbutton()){
             LCD.print("quiting");
             LCD.clear();

@@ -22,6 +22,8 @@ int armStepDelay, int clawPin, int armPin) {
 }
 
 Claw::~Claw() {
+    p_claw->detach();
+    p_arm->detach();
     delete p_claw;
     delete p_arm;
     p_claw = NULL;
