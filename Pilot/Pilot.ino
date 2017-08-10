@@ -62,9 +62,9 @@ void Pilot(bool left) {
 
   executeRetrivalFSM(25, 12, 150, 90);
 
-  ziplineSequence = 
-  new Zipline_Navigator (150, 25, 12, 90, DistanceToZipline->Value, HowLongToTurn->Value, ManeuverRightConstant->Value, ManeuverLeftConstant->Value);
-  ziplineSequence->Drive(left);
+//  ziplineSequence = 
+//  new Zipline_Navigator (150, 25, 12, 90, DistanceToZipline->Value, HowLongToTurn->Value, ManeuverRightConstant->Value, ManeuverLeftConstant->Value);
+//  ziplineSequence->Drive(left);
 }
 
 void testMenu() {
@@ -235,6 +235,7 @@ void mainMenu()
   delay(500);
 
   RCServo0.write(177);    RCServo1.write(177);
+  RCServo0.detach();      RCServo1.detach();
  
   while (true){
     int menuIndex = map(knob(6), 0, 1024, 0, numberOfMainMenuOptions); /* Menu items plus the Drive option */

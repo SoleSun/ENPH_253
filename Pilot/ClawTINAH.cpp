@@ -38,7 +38,7 @@ void Claw::retrieve(int armDownPosition){
     this->armDown(armDownPosition);
     this->clawClose();
 
-    delay(1000);
+    delay(100);
     //dropping into the box
     this->armUp();
     this->clawOpen();

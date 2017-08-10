@@ -20,10 +20,10 @@ Gate_Navigator::Gate_Navigator (int thresholdValue, int proportionalGain, int de
  * for a slower speed
  */
 void Gate_Navigator::driveSlow(){
-  thresholdVal   = 200;
-  speedVal       = 65;
+  thresholdVal   = 150;
+  speedVal       = 90;
   proportionalVal = 25;
-  derivativeVal  = 0;
+  derivativeVal  = 12;
 }
 
 /**
@@ -75,6 +75,7 @@ bool Gate_Navigator::Drive(bool drivingOnLeftSurface) {
   int lastError = 0, recentError = 0;
   int q = 0, m = 0, con = 0;
 
+  int leftSurfacePostGateOffsetDist = 60; 
   Encoder distCalculator = Encoder();
   
   LCD.clear(); LCD.home();
@@ -92,26 +93,37 @@ bool Gate_Navigator::Drive(bool drivingOnLeftSurface) {
     
     /* The distance that was travelled so far */
   	int averageDist = (distCalculator.getDistanceRightWheel() + distCalculator.getDistanceLeftWheel()) / 2;
-
-    if (averageDist > distanceAfterGateVal - 30){
-      driveSlow();
+    
+    if (drivingOnLeftSurface) {
+      if (averageDist > (distanceAfterGateVal - leftSurfacePostGateOffsetDist)){
+        driveSlow();
+        
+        if ( analogRead(leftQRDSensor) > thresholdVal && analogRead(centreLeftQRDSensor) > thresholdVal && analogRead(centreRightQRDSensor) > thresholdVal && analogRead(rightQRDSensor) > thresholdVal){
+          motor.speed(leftMotor, -speedVal);    motor.speed(rightMotor, -speedVal); 
+  
+          return true;
+        }
+      }
+    }
+    else {
+      if (averageDist > distanceAfterGateVal){
+        motor.speed(leftMotor, 0);    motor.speed(rightMotor, 0);
+        delay(200);
+        
+        LCD.print("Entrance at:"); LCD.setCursor(0,1); LCD.print(averageDist);
+        
+        forward(10);
+  
+        while(analogRead(centreRightQRDSensor) < thresholdVal){
+          motor.speed(leftMotor,-70);    motor.speed(rightMotor,-70);
+        }
+  
+        motor.speed(leftMotor, 0);    motor.speed(rightMotor, 0);
+                
+        return true;
+      }
     }
     
-    if (averageDist > distanceAfterGateVal) {
-      LCD.print("Entrance at:"); LCD.setCursor(0,1); LCD.print(averageDist);
-
-      motor.speed(leftMotor, 0);    motor.speed(rightMotor, 0);
-      delay(1000);
-      forward(10);
-
-      while(analogRead(centreRightQRDSensor) < thresholdVal){
-        motor.speed(leftMotor,-70);    motor.speed(rightMotor,-70);
-      }
-
-      motor.speed(leftMotor, 0);    motor.speed(rightMotor, 0);
-              
-      return true;
-    }
       
     /* If the beacon is not flashing 1 KHz and the robot has already travelled its allotted safe distance */
   	if (!stoppedOnce && averageDist > distToGateVal) {
@@ -138,6 +150,8 @@ bool Gate_Navigator::Drive(bool drivingOnLeftSurface) {
           LCD.setCursor(0,1); LCD.print("QSD: "); LCD.print(analogRead (OneKHzSensorPin));
           delay(15);
         }
+
+//        recentError = lastError = 0;
 //      } else {
 //        /* Wait for the gate alarm to cycle at least once */
 //        /* If the analog value goes below the threshold, then the gate is on */

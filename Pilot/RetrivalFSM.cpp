@@ -22,9 +22,9 @@ int lastError, recentError;
 int q = 0, m = 0, con = 0; 
 
 // Competition Surface Left
-int armDownPositionsLeft[6] = {10,5,5,5,5,5};
-int alignmentDistanceForwardLeft[6] = {10,10,10,10,10,10};
-int alignmentDistanceBackwardLeft[6] = {3, 10, 10, 10, 10,10};
+int armDownPositionsLeft[6] = {5,5,5,5,5,5};
+int alignmentDistanceForwardLeft[7] = {10,10,10,10,10,10,10};
+int alignmentDistanceBackwardLeft[7] = {3, 10, 10, 10, 10,10,5};
 int forwardDistanceLeft[6]= {15, 15, 15, 15,20,15};
 
 // StateMachine State:

@@ -15,7 +15,7 @@ class Zipline_Navigator{
 		int rightConst;
 		int leftConst;
 
-		void tapeFollow ();
+		void tapeFollow (bool drivingOnLeftSurface);
 		void driveToZipline(); 
 		void latch (bool drivingOnLeftSurface);
 		void lift ();

@@ -225,24 +225,10 @@ void TestProcedures::testMotors () {
 /* Test procedure for the 270 and 150 Servos we have */
 void TestProcedures::testLift() {
   int flag = 0;
+  /* Original values are servo0 = 15 and servo2 = 63 */
+  const int initalizedangle = 177, servo0 = 15, servo2 = 52;
 
-  while (true) {
-    LCD.clear(); LCD.home();
-    LCD.print("Ensure Servos"),
-    LCD.setCursor(0,1), LCD.print("at Rest");
-    delay(750);
-    LCD.clear(); LCD.home(); 
-    LCD.print("Press Start");
-    LCD.setCursor(0,1);
-    LCD.print("To Begin");
-    delay(750);
-    if(startbutton()) {
-      delay(100);
-      if (startbutton()){
-        break;
-      }
-    }
-  }
+  RCServo0.attach(RCServo0Output);    RCServo1.attach(RCServo1Output);
   
   while (true){
     LCD.clear(); LCD.home(); 
@@ -250,26 +236,39 @@ void TestProcedures::testLift() {
     if(startbutton()) {
       delay(100);
       if (startbutton()){ 
-        if (!flag) {  
-          RCServo0.write(150);
-          RCServo1.write(0);
-          flag++;
-        } else {
-          RCServo0.write(0);
-          RCServo1.write(150);
-          flag--;
+        if (!flag) {
+          // 102 + 8 = 110 must be << 114(max increment for servo2)
+          for (int i = 0; i <= 102; i++){
+            if ( i > 0 && i < 102){
+              RCServo0.write(initalizedangle - 40 - i);    RCServo1.write(initalizedangle - 8 - i);
+            }
+            else if (i == 0){
+              RCServo0.write(initalizedangle - 37);        RCServo1.write(initalizedangle - 8);
+            }
+            else{
+              RCServo0.write(servo0);      RCServo1.write(servo2);
+            }
+            delay(100);
+          }
+          
+          flag = true;
+        }
+        else {
+          for (int i = 102; i >= 0; i--){
+          if ( i > 0 && i < 102){
+            RCServo0.write(initalizedangle - 40 - i);    RCServo1.write(initalizedangle - 8 - i);
+          }
+          else if (i == 0){
+            RCServo0.write(initalizedangle - 37);        RCServo1.write(initalizedangle - 8);
+          }
+          else{
+            RCServo0.write(servo0);      RCServo1.write(servo2);
+          }
+          delay(100);
+          }
+          flag = false;
         }
       }
-    }
-
-    if (!flag) {  
-      LCD.print("Left: 150");
-      LCD.setCursor(0,1);
-      LCD.print("Right: 0");
-    } else {
-      LCD.print("Left: 0");
-      LCD.setCursor(0,1);
-      LCD.print("Right: 150");
     }
     
     if (stopbutton())
@@ -277,7 +276,7 @@ void TestProcedures::testLift() {
       delay(100);
       if (stopbutton())
         { 
-          motor.speed(leftMotor, 0); motor.speed(rightMotor, 0);
+          RCServo0.detach();    RCServo1.detach();
           LCD.clear(); LCD.home();
           LCD.print("Exiting");
           LCD.setCursor(0,1); LCD.print("Lift Test");
